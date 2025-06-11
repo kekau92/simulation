@@ -145,6 +145,12 @@
             animation: blink 1s infinite;
         }
         
+        .access-link {
+            color: #3affc2;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
         .controls {
             display: flex;
             flex-direction: column;
@@ -192,70 +198,6 @@
         
         #start-button:hover::before {
             left: 100%;
-        }
-        
-        #confirm-box {
-            display: none;
-            background: rgba(10, 15, 15, 0.95);
-            border: 1px solid var(--neon-red);
-            border-radius: 8px;
-            padding: 25px;
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 0, 60, 0.3);
-            margin-top: 20px;
-        }
-        
-        #confirm-box p {
-            color: var(--terminal-green);
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            line-height: 1.6;
-            text-shadow: 0 0 5px rgba(58, 255, 194, 0.5);
-        }
-        
-        .confirm-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .confirm-button {
-            padding: 12px 30px;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(20, 25, 25, 0.8);
-            color: var(--terminal-text);
-            border: 1px solid transparent;
-        }
-        
-        #confirm-yes {
-            background: rgba(58, 255, 194, 0.1);
-            color: var(--terminal-green);
-            border: 1px solid var(--terminal-green);
-        }
-        
-        #confirm-yes:hover {
-            background: rgba(58, 255, 194, 0.2);
-            box-shadow: 0 0 15px rgba(58, 255, 194, 0.3);
-        }
-        
-        #confirm-no {
-            background: rgba(255, 0, 60, 0.1);
-            color: var(--neon-red);
-            border: 1px solid var(--neon-red);
-        }
-        
-        #confirm-no:hover {
-            background: rgba(255, 0, 60, 0.2);
-            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
         }
         
         .glitch {
@@ -377,17 +319,13 @@
                 font-size: 1rem;
                 padding: 12px;
             }
-            
-            #confirm-box p {
-                font-size: 1.1rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1 class="glitch" data-text="Нейролинк: Симуляция">Нейролинк: Симуляция</h1>
-        <div class="subtitle">Подключение к Андрею, сыну Пустоты</div>
+        <div class="subtitle">Подключение к Андрею, ACCESS_REQUEST: СКРЫТАЯ ЧАСТЬ</div>
     </div>
     
     <div class="terminal-container">
@@ -397,25 +335,17 @@
                 <div class="terminal-dot dot-yellow"></div>
                 <div class="terminal-dot dot-green"></div>
             </div>
-            <div class="terminal-title">ТЕРМИНАЛ СВЯЗИ: Андрей [СЫН ПУСТОТЫ]</div>
+            <div class="terminal-title">SYSTEM NEUROLINK CONSOLE > TRACE: SUBJECT = ANDREI_001</div>
         </div>
         <div id="output"></div>
     </div>
     
     <div class="controls">
         <button id="start-button">ВХОД В СИСТЕМУ</button>
-        
-        <div id="confirm-box">
-            <p>ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ</p>
-            <div class="confirm-buttons">
-                <button id="confirm-yes" class="confirm-button">ПОДТВЕРДИТЬ</button>
-                <button id="confirm-no" class="confirm-button">ОТКЛОНИТЬ</button>
-            </div>
-        </div>
     </div>
     
     <div class="footer">
-        Система нейронного подключения v3.0 | Чёрный Пелотон © 2025
+        PROCESSOR = trauma.sync.v3.0 │ │ > RANGE: chapters 1–3 | MODE = passive relay (subcortical + auditory layers)
     </div>
 
     <script src="script.js"></script>
