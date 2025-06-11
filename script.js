@@ -1,5 +1,6 @@
 const postClickIntro = `> Попытка: взаимно стабилизировать нервную систему...
 > Результат: частичный успех.
+> Требуется 3 из 3 совпадений
 > Формируется биохимическая петля...
 > Источник: знакомая травма → реакция страха → всплеск дофамина
 > Цикл устойчив. Саморазрушение маскируется под близость.`;
@@ -11,7 +12,11 @@ const memoryFragments = [
     "TUNNEL: walls_breathe_her_tears",
     "WINDOW: paint_and_rust",
     "PAIN: hot_wire_in_thigh",
-    "BOY: her_eyes_in_his"
+    "BOY: her_eyes_in_his",
+    "OFFICE: hollow_chest_echo",
+    "BICYCLE: carbon_crucifixion",
+    "COFFEE: mourning_brew_sips",
+    "ORLENOK: rusty_bones_bell"
 ];
 
 const readerTraumaProfile = [
@@ -27,7 +32,11 @@ const events = [
     { id: "muscle_spasm", desc: "Судорога в ноге.", trigger: "Насмешка: 'Позор.'" },
     { id: "church_memory", desc: "Церковь у реки.", trigger: "Призыв: 'Сожги.'" },
     { id: "riverbank_whisper", desc: "Шёпот матери у реки.", trigger: "Голос: 'Я умерла?'" },
-    { id: "tunnel_collapse", desc: "Мальчик с её глазами.", trigger: "Крик: 'Ты ударил!'" }
+    { id: "tunnel_collapse", desc: "Мальчик с её глазами.", trigger: "Крик: 'Ты ударил!'" },
+    { id: "office_procol", desc: "Офис гудит пустотой.", trigger: "Шёпот: 'Ты не здесь.'" },
+    { id: "peloton_call", desc: "Чёрный Пелотон зовёт.", trigger: "Уведомление: 'Исповедь.'" },
+    { id: "coffee_ritual", desc: "Траурный напиток в кафе.", trigger: "Взгляд: 'Чужой.'" },
+    { id: "orlenok_vision", desc: "Орлёнок на пустой дороге.", trigger: "Звонок: 'Смех травы.'" }
 ];
 
 let traumaAlignmentCount = 0;
@@ -42,6 +51,7 @@ function sleep(ms) {
 
 function typeWriter(text, callback) {
     if (!outputDiv) return;
+    
     const lines = text.split('\n');
     let currentLine = 0;
     
@@ -54,12 +64,12 @@ function typeWriter(text, callback) {
                 if (i < line.length) {
                     outputDiv.textContent += line.charAt(i);
                     i++;
-                    setTimeout(typeChar, 30);
+                    setTimeout(typeChar, 15);
                 } else {
                     outputDiv.textContent += '\n';
                     outputDiv.scrollTop = outputDiv.scrollHeight;
                     currentLine++;
-                    setTimeout(writeLine, 100);
+                    setTimeout(writeLine, 50);
                 }
             }
             
@@ -84,16 +94,16 @@ async function simulateConnection() {
     await sleep(500);
     
     await new Promise(resolve => {
-        typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server...', resolve);
+        typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
     });
     
-    await sleep(500);
+    await sleep(800);
     
     await new Promise(resolve => {
-        typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'msms', resolve);
+        typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
     });
     
-    await sleep(500);
+    await sleep(600);
     
     await new Promise(resolve => {
         typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
@@ -103,7 +113,7 @@ async function simulateConnection() {
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
         await new Promise(resolve => {
-            typeWriter('[NEURALINK] Connection lost. Retry...', resolve);
+            typeWriter('[NEURALINK] Connection lost. Retrying...', resolve);
         });
         
         await sleep(1200);
@@ -130,7 +140,7 @@ async function processEvent(event) {
         typeWriter(`[TRIGGER] ${event.trigger}`, resolve);
     });
     
-    await sleep(500);
+    await sleep(700);
     
     if (traumaAlignmentCount < alignmentThreshold) {
         const serverTrauma = getRandomServerTrauma();
@@ -148,7 +158,7 @@ async function processEvent(event) {
             
             if (traumaAlignmentCount >= alignmentThreshold) {
                 await new Promise(resolve => {
-                    typeWriter('\n-----------------', resolve);
+                    typeWriter('\n=================', resolve);
                 });
                 
                 await new Promise(resolve => {
@@ -160,12 +170,11 @@ async function processEvent(event) {
                 });
                 
                 await new Promise(resolve => {
-                    typeWriter('-----------------', resolve);
+                    typeWriter('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ\n\nПОДТВЕРДИТЬ\nОТКЛОНИТЬ', resolve);
                 });
                 
                 document.getElementById('confirm-box').style.display = 'block';
-                outputDiv.scrollTop = outputDiv.scrollHeight;
-                return true;
+                return "ACCESS";
             }
         } else {
             await new Promise(resolve => {
@@ -178,7 +187,6 @@ async function processEvent(event) {
 async function startSimulation() {
     if (isSimulating) return;
     isSimulating = true;
-    console.log('Simulation started');
     
     const startButton = document.getElementById('start-button');
     startButton.textContent = "ПОДКЛЮЧЕНИЕ...";
@@ -194,35 +202,35 @@ async function startSimulation() {
         
         for (let event of events) {
             const result = await processEvent(event);
-            if (result) break;
+            if (result === "ACCESS") break;
             
             await new Promise(resolve => {
                 typeWriter('----------------------------------------', resolve);
             });
+            
             await sleep(1000);
         }
         
         if (traumaAlignmentCount < alignmentThreshold) {
             await new Promise(resolve => {
-                typeWriter('\n[NEURALINK] Insufficient trauma alignment.', resolve);
+                typeWriter('\n[NEURALINK] Insufficient trauma alignment. Access denied.', resolve);
             });
         }
     } catch (e) {
         console.error('Error:', e);
         await new Promise(resolve => {
-            typeWriter(`[ERROR] Failed: ${e.message}`, resolve);
+            typeWriter(`[ERROR] Simulation failed: ${e.message}`, resolve);
         });
     } finally {
-        startButton.textContent = "ПЕРЕЗАПУСТИТЬ";
+        startButton.textContent = "ПЕРЕЗАПУСТИТЬ СИМУЛЯЦИЮ";
         startButton.disabled = false;
         isSimulating = false;
-        console.log('Simulation ended');
     }
 }
 
 function confirmChapter(confirmed) {
     if (confirmed) {
-        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMiKUZlFl0zI/view';
+        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI';
     } else {
         window.location.href = 'https://t.me/santabeansreserveandlab';
     }
@@ -230,20 +238,11 @@ function confirmChapter(confirmed) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start-button');
-    if (startButton) {
-        startButton.addEventListener('click', startSimulation);
-        startButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            console.log('Touchstart triggered');
-            startSimulation();
-        });
-    } else {
-        console.error('Start button missing');
-        alert('Error: Button not found. Refresh page.');
-    }
+    startButton.addEventListener('click', startSimulation);
     
     const confirmYes = document.getElementById('confirm-yes');
     const confirmNo = document.getElementById('confirm-no');
+    
     confirmYes.addEventListener('click', () => confirmChapter(true));
     confirmNo.addEventListener('click', () => confirmChapter(false));
 });
