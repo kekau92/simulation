@@ -172,32 +172,32 @@ async function simulateConnection() {
     await sleep(300);
     
     await new Promise(resolve => {
-        typeWriter('[NEUROLINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
+        typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
     });
     
     await sleep(500);
     
     await new Promise(resolve => {
-        typeWriter('[NEUROLINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
+        typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
     });
     
     await sleep(400);
     
     await new Promise(resolve => {
-        typeWriter('[NEUROLINK] Connected. Scanning psyche...', resolve);
+        typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
     });
 }
 
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
         await new Promise(resolve => {
-            typeWriter('[NEUROLINK] Connection lost. Retrying...', resolve);
+            typeWriter('[NEURALINK] Connection lost. Retrying...', resolve);
         });
         
         await sleep(800);
         
         await new Promise(resolve => {
-            typeWriter('[NEUROLINK] Connection restored.', resolve);
+            typeWriter('[NEURALINK] Connection restored.', resolve);
         });
         
         return true;
@@ -221,20 +221,13 @@ async function processEvent(event) {
     await sleep(500);
     
     if (traumaAlignmentCount < alignmentThreshold) {
-        let serverTrauma = getRandomServerTrauma();
+        const serverTrauma = getRandomServerTrauma();
         
         await new Promise(resolve => {
-            typeWriter(`[NEUROLINK] Trauma: ${serverTrauma}`, resolve);
+            typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, resolve);
         });
         
-        let isAligned = readerTraumaProfile.includes(serverTrauma);
-        if (!isAligned && Math.random() < 0.1) {
-            serverTrauma = readerTraumaProfile[Math.floor(Math.random() * readerTraumaProfile.length)];
-            isAligned = true;
-            await new Promise(resolve => {
-                typeWriter(`[NEUROLINK] Forced alignment: ${serverTrauma}`, resolve);
-            });
-        }
+        const isAligned = readerTraumaProfile.includes(serverTrauma);
         
         if (isAligned) {
             traumaAlignmentCount++;
@@ -249,7 +242,7 @@ async function processEvent(event) {
                 });
                 
                 await new Promise(resolve => {
-                    typeWriter('[NEUROLINK] ACCESS UNLOCKED', resolve);
+                    typeWriter('[NEURALINK] ACCESS UNLOCKED', resolve);
                 });
                 
                 await new Promise(resolve => {
@@ -267,7 +260,7 @@ async function processEvent(event) {
             }
         } else {
             await new Promise(resolve => {
-                typeWriter('[NEUROLINK] No alignment.', resolve);
+                typeWriter('[NEURALINK] No alignment.', resolve);
             });
         }
     }
@@ -301,7 +294,7 @@ async function startSimulation() {
         
         if (traumaAlignmentCount < alignmentThreshold) {
             await new Promise(resolve => {
-                typeWriter(`\n> [NEUROLINK] Недостаточное совпадение травмы. Доступ запрещён.
+                typeWriterWithLink(`\n> [NEURALINK] Недостаточное совпадение травмы. Доступ запрещён.
 > Insufficient trauma alignment. Access denied.
 > Возможные причины:
 - Эмоциональное подавление
@@ -310,7 +303,11 @@ async function startSimulation() {
 > Рекомендация:
 >> Восстановить сенсорный след (через запах, звук, голос)
 >> Запросить внешний стимул для разблокировки памяти
-> Повторить попытку подключения`, resolve);
+> Связаться с поддержкой: santabeansreserveandlab
+> Повторить попытку подключения //ПЕРЕЗАПУСТИТЬ СИМУЛЯЦИЮ//`, 
+                    'santabeansreserveandlab', 
+                    'https://t.me/santabeansreserveandlab', 
+                    resolve);
             });
         }
     } catch (e) {
