@@ -64,10 +64,20 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function appendLine(text, callback) {
-    outputDiv.textContent += text + '\n';
-    outputDiv.scrollTop = outputDiv.scrollHeight;
-    callback();
+function typeWriter(text, callback) {
+    let i = 0;
+    function type() {
+        if (i < text.length) {
+            outputDiv.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, 30);
+        } else {
+            outputDiv.innerHTML += '\n';
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            callback();
+        }
+    }
+    type();
 }
 
 function getRandomMemory() {
@@ -75,45 +85,44 @@ function getRandomMemory() {
 }
 
 async function simulatePing() {
-    outputDiv.textContent = '';
-    appendLine('[NEURALINK] Pinging neuralink-server.texas.usa [192.168.1.100]...', () => {});
-    await sleep(500);
+    outputDiv.innerHTML = '';
+    await typeWriter('[NEURALINK] Pinging neuralink-server.texas.usa [192.168.1.100]...', () => {});
     let attempts = 0;
     while (attempts < 3) {
+        await sleep(500);
         if (Math.random() < 0.3) {
-            appendLine('[NEURALINK] Connection lost. Re-establishing...', () => {});
+            await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
             attempts++;
             await sleep(1000);
         } else {
-            appendLine(`[NEURALINK] Reply from 192.168.1.100: bytes=32 time=${Math.floor(Math.random() * 100)}ms TTL=64`, () => {});
+            await typeWriter(`[NEURALINK] Reply from 192.168.1.100: bytes=32 time=${Math.floor(Math.random() * 100)}ms TTL=64`, () => {});
             await sleep(500);
             break;
         }
     }
     if (attempts >= 3) {
-        appendLine('[NEURALINK] Connection failed. Retrying in background...', () => {});
+        await typeWriter('[NEURALINK] Connection failed. Retrying in background...', () => {});
         await sleep(1000);
     }
-    appendLine('[NEURALINK] Connected successfully.', () => {});
+    await typeWriter('[NEURALINK] Connected successfully.', () => {});
     await sleep(500);
-    outputDiv.textContent = '';
+    outputDiv.innerHTML = '';
 }
 
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
-        appendLine('[NEURALINK] Connection lost. Re-establishing...', () => {});
-        await sleep(1000);
+        await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
         let attempts = 0;
         while (attempts < 3) {
+            await sleep(1000);
             if (Math.random() < 0.5) {
-                appendLine('[NEURALINK] Connection restored.', () => {});
+                await typeWriter('[NEURALINK] Connection restored.', () => {});
                 return true;
             }
-            appendLine('[NEURALINK] Reconnect attempt failed. Retrying...', () => {});
+            await typeWriter('[NEURALINK] Reconnect attempt failed. Retrying...', () => {});
             attempts++;
-            await sleep(1000);
         }
-        appendLine('[NEURALINK] Connection restored (emergency bypass).', () => {});
+        await typeWriter('[NEURALINK] Connection restored (emergency bypass).', () => {});
         return true;
     }
     return false;
@@ -124,37 +133,34 @@ async function processEvent(event) {
         if (await simulateConnectionDrop()) {
             await sleep(500);
         }
-        appendLine(`[EVENT] ${event.desc}`, () => {});
-        await sleep(500);
-        appendLine(`[TRIGGER] ${event.trigger}`, () => {});
-        await sleep(500);
-        appendLine(`[NEURALINK] Processing: ${event.id}`, () => {});
+        await typeWriter(`[EVENT] ${event.desc}`, () => {});
+        await typeWriter(`[TRIGGER] ${event.trigger}`, () => {});
+        await typeWriter(`[NEURALINK] Processing: ${event.id}`, () => {});
         await sleep(500);
         if (traumaCount < unlockThreshold && Math.random() < errorRate) {
             const horror = getRandomMemory();
-            appendLine(`[HORROR] Trauma detected: ${horror}`, () => {});
+            await typeWriter(`[HORROR] Trauma detected: ${horror}`, () => {});
             traumaCount++;
-            appendLine(`[DEBUG] Traumatic glitches: ${traumaCount}/${unlockThreshold}`, () => {});
-            await sleep(500);
+            await typeWriter(`[DEBUG] Traumatic glitches: ${traumaCount}/${unlockThreshold}`, () => {});
             if (traumaCount >= unlockThreshold) {
-                appendLine('=====================================', () => {});
-                appendLine('[NEURALINK] ACCESS UNLOCKED: Hidden Chapter', () => {});
-                appendLine('[HORROR] The tunnel breathes, her voice tears through the mind!', () => {});
-                appendLine('=====================================', () => {});
+                await typeWriter('=====================================', () => {});
+                await typeWriter('[NEURALINK] ACCESS UNLOCKED: Hidden Chapter', () => {});
+                await typeWriter('[HORROR] The tunnel breathes, her voice tears through the mind!', () => {});
+                await typeWriter('=====================================', () => {});
                 document.getElementById('confirm-box').style.display = 'block';
+                outputDiv.scrollTop = outputDiv.scrollHeight;
                 return "ACCESS//HIDDEN_CHAPTER";
             }
-            appendLine('[RESULT] Action: LOOP//TRAUMA_NIGHTMARE', () => {});
+            await typeWriter('[RESULT] Action: LOOP//TRAUMA_NIGHTMARE', () => {});
             return "LOOP//TRAUMA_NIGHTMARE";
         }
-        appendLine(`[NEURALINK] Status: Processed, Action: ${event.action}`, () => {});
-        await sleep(500);
-        appendLine(`[RESULT] Action: ${event.action}`, () => {});
-        await sleep(500);
+        await typeWriter(`[NEURALINK] Status: Processed, Action: ${event.action}`, () => {});
+        await typeWriter(`[RESULT] Action: ${event.action}`, () => {});
+        outputDiv.scrollTop = outputDiv.scrollHeight;
         return event.action;
     } catch (e) {
         console.error('Event processing failed:', e);
-        appendLine(`[ERROR] Failed to process event: ${event.id}`, () => {});
+        await typeWriter(`[ERROR] Failed to process event: ${event.id}`, () => {});
     }
 }
 
@@ -164,23 +170,23 @@ async function startSimulation() {
     console.log('Starting simulation...');
     document.getElementById('confirm-box').style.display = 'none';
     outputDiv = document.getElementById('output');
-    outputDiv.textContent = '';
+    outputDiv.innerHTML = '';
     traumaCount = 0;
     try {
         await simulatePing();
-        appendLine('[NEURALINK] Starting simulation...', async () => {});
-        await sleep(500);
-        for (let event of events) {
-            const action = await processEvent(event);
-            appendLine('------------------------------------------------------------', () => {});
-            await sleep(1000);
-            if (action === "ACCESS//HIDDEN_CHAPTER") break;
-        }
-        isSimulating = false;
-        console.log('Simulation completed.');
+        await typeWriter('[NEURALINK] Starting simulation...', async () => {
+            for (let event of events) {
+                const action = await processEvent(event);
+                await typeWriter('------------------------------------------------------------', () => {});
+                if (action === "ACCESS//HIDDEN_CHAPTER") break;
+                await sleep(1000);
+            }
+            isSimulating = false;
+            console.log('Simulation completed.');
+        });
     } catch (e) {
         console.error('Simulation error:', e);
-        appendLine(`[CRITICAL ERROR] Simulation aborted: ${e.message}`, () => {});
+        await typeWriter(`[CRITICAL ERROR] Simulation aborted: ${e.message}`, () => {});
         isSimulating = false;
     }
 }
@@ -198,10 +204,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startButton) {
         startButton.addEventListener('click', () => {
             console.log('Start button clicked.');
-            startSimulation();
-        });
-    } else {
-        console.error('Start button not found.');
-        alert('Error: Start button not found. Please refresh the page.');
-    }
-});
+            startSimulation
