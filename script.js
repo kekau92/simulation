@@ -69,7 +69,7 @@ function typeWriter(text, callback) {
         if (i < text.length) {
             outputDiv.innerHTML += text.charAt(i);
             i++;
-            setTimeout(type, 50); // Typing speed
+            setTimeout(type, 30); // Faster typing for mobile
         } else {
             outputDiv.innerHTML += '\n';
             callback();
@@ -83,31 +83,36 @@ function getRandomMemory() {
 }
 
 async function processEvent(event) {
-    await typeWriter(`[СОБЫТИЕ] ${event.desc}`, () => {});
-    await typeWriter(`[ТРИГГЕР] ${event.trigger}`, () => {});
-    await typeWriter(`[НЕЙРОЛИНК] Обработка: ${event.id}`, () => {});
-    await sleep(500);
-    if (traumaCount < unlockThreshold && Math.random() < errorRate) {
-        const horror = getRandomMemory();
-        await typeWriter(`<span class="horror">[УЖАС] Травма врывается: ${horror}</span>`, () => {});
-        traumaCount++;
-        await typeWriter(`[DEBUG] Травматичных гличей: ${traumaCount}/${unlockThreshold}`, () => {});
-        if (traumaCount >= unlockThreshold) {
-            await typeWriter(`=====================================`, () => {});
-            await typeWriter(`<div class="unlock">[НЕЙРОЛИНК] ДОСТУП РАЗБЛОКИРОВАН: Свиток III½ - Суд на берегу Стикса`, () => {});
-            await typeWriter(`[УЖАС] Туннель дышит, голос матери разрывает разум!`, () => {});
-            await typeWriter(`=====================================</div>`, () => {});
-            document.getElementById('confirm-box').style.display = 'block';
-            outputDiv.scrollTop = outputDiv.scrollHeight;
-            return "ДОСТУП//СЕКРЕТНАЯ_ГЛАВА";
+    try {
+        await typeWriter(`[СОБЫТИЕ] ${event.desc}`, () => {});
+        await typeWriter(`[ТРИГГЕР] ${event.trigger}`, () => {});
+        await typeWriter(`[НЕЙРОЛИНК] Обработка: ${event.id}`, () => {});
+        await sleep(500);
+        if (traumaCount < unlockThreshold && Math.random() < errorRate) {
+            const horror = getRandomMemory();
+            await typeWriter(`<span class="horror">[УЖАС] Травма врывается: ${horror}</span>`, () => {});
+            traumaCount++;
+            await typeWriter(`[DEBUG] Травматичных гличей: ${traumaCount}/${unlockThreshold}`, () => {});
+            if (traumaCount >= unlockThreshold) {
+                await typeWriter(`=====================================`, () => {});
+                await typeWriter(`<div class="unlock">[НЕЙРОЛИНК] ДОСТУП РАЗБЛОКИРОВАН: Свиток III½ - Суд на берегу Стикса</div>`, () => {});
+                await typeWriter(`[УЖАС] Туннель дышит, голос матери разрывает разум!`, () => {});
+                await typeWriter(`=====================================`, () => {});
+                document.getElementById('confirm-box').style.display = 'block';
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+                return "ДОСТУП//СЕКРЕТНАЯ_ГЛАВА";
+            }
+            await typeWriter(`[РЕЗУЛЬТАТ] Действие: ПЕТЛЯ//ТРАВМА_КОШМАР`, () => {});
+            return "ПЕТЛЯ//ТРАВМА_КОШМАР";
         }
-        await typeWriter(`[РЕЗУЛЬТАТ] Действие: ПЕТЛЯ//ТРАВМА_КОШМАР`, () => {});
-        return "ПЕТЛЯ//ТРАВМА_КОШМАР";
+        await typeWriter(`[НЕЙРОЛИНК] Состояние: Обработано, Действие: ${event.action}`, () => {});
+        await typeWriter(`[РЕЗУЛЬТАТ] Действие: ${event.action}`, () => {});
+        outputDiv.scrollTop = outputDiv.scrollHeight;
+        return event.action;
+    } catch (e) {
+        console.error('Event processing failed:', e);
+        await typeWriter(`[ОШИБКА] Не удалось обработать событие: ${event.id}`, () => {});
     }
-    await typeWriter(`[НЕЙРОЛИНК] Состояние: Обработано, Действие: ${event.action}`, () => {});
-    await typeWriter(`[РЕЗУЛЬТАТ] Действие: ${event.action}`, () => {});
-    outputDiv.scrollTop = outputDiv.scrollHeight;
-    return event.action;
 }
 
 async function startSimulation() {
@@ -117,15 +122,21 @@ async function startSimulation() {
     outputDiv = document.getElementById('output');
     outputDiv.innerHTML = '';
     traumaCount = 0;
-    await typeWriter('[НЕЙРОЛИНК] Запуск симуляции...', async () => {
-        for (let event of events) {
-            const action = await processEvent(event);
-            await typeWriter('------------------------------------------------------------', () => {});
-            if (action === "ДОСТУП//СЕКРЕТНАЯ_ГЛАВА") break;
-            await sleep(1000);
-        }
+    try {
+        await typeWriter('[НЕЙРОЛИНК] Запуск симуляции...', async () => {
+            for (let event of events) {
+                const action = await processEvent(event);
+                await typeWriter('------------------------------------------------------------', () => {});
+                if (action === "ДОСТУП//СЕКРЕТНАЯ_ГЛАВА") break;
+                await sleep(1000);
+            }
+            isSimulating = false;
+        });
+    } catch (e) {
+        console.error('Simulation error:', e);
+        await typeWriter(`[КРИТИЧЕСКАЯ ОШИБКА] Симуляция прервана: ${e.message}`, () => {});
         isSimulating = false;
-    });
+    }
 }
 
 function confirmChapter(confirmed) {
