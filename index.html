@@ -2,70 +2,98 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Нейролинк: Симуляция Психики Андрея</title>
     <style>
-        body {
-            background: #1a1a1a;
-            color: #e0e0e0;
-            font-family: 'Courier New', monospace;
-            padding: 20px;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
         }
         #container {
-            max-width: 800px;
-            margin: 0 auto;
+            flex: 1;
+            padding: 2vw;
+            overflow-y: auto;
+            width: 100%;
+            height: 100%;
         }
         h1 {
-            color: #ff4040;
+            color: #ff0000;
             text-align: center;
+            font-size: 5vw;
+            margin-bottom: 2vw;
         }
         p {
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 3.5vw;
+            line-height: 1.4;
+            margin-bottom: 2vw;
         }
         #output {
             white-space: pre-wrap;
-            font-size: 14px;
-            background: #2a2a2a;
-            padding: 15px;
-            border: 1px solid #ff4040;
+            font-size: 3vw;
+            background: #1a1a1a;
+            padding: 2vw;
+            border: 1px solid #ff0000;
             border-radius: 5px;
-            min-height: 400px;
+            height: 60vh;
             overflow-y: auto;
+            margin-bottom: 2vw;
         }
         .horror {
-            color: #ff4040;
+            color: #ff0000;
             font-weight: bold;
         }
         .unlock {
-            border: 2px solid #ff4040;
-            padding: 10px;
-            background: #2a2a2a;
-            margin-top: 10px;
+            border: 2px solid #ff0000;
+            padding: 2vw;
+            background: #1a1a1a;
+            margin-top: 2vw;
+            font-size: 3.5vw;
         }
         a {
-            color: #40c4ff;
-            text-decoration: none;
-        }
-        a:hover {
+            color: #ff0000;
             text-decoration: underline;
         }
+        a:hover {
+            color: #cc0000;
+        }
         button {
-            background: #ff4040;
-            color: #e0e0e0;
+            background: #ff0000;
+            color: #ffffff;
             border: none;
-            padding: 10px 20px;
+            padding: 2vw 4vw;
             font-family: 'Courier New', monospace;
+            font-size: 4vw;
             cursor: pointer;
-            margin: 10px 0;
+            margin: 2vw 0;
+            width: 100%;
+            border-radius: 5px;
         }
         button:hover {
-            background: #cc3333;
+            background: #cc0000;
         }
         #confirm-box {
             display: none;
-            margin-top: 20px;
             text-align: center;
+            font-size: 3.5vw;
+        }
+        @media (min-width: 768px) {
+            h1 { font-size: 3rem; }
+            p { font-size: 1.2rem; }
+            #output { font-size: 1rem; }
+            .unlock { font-size: 1.2rem; }
+            button { font-size: 1.5rem; padding: 10px 20px; width: auto; }
+            #confirm-box { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -73,7 +101,7 @@
     <div id="container">
         <h1>Нейролинк: Симуляция Психики Андрея</h1>
         <p>Запустите симуляцию, чтобы пройти через психику Андрея и открыть <i>Свиток III½: Суд на берегу Стикса</i>. Следите за гличями "[УЖАС]".</p>
-        <button onclick="startSimulation()">Запустить Симуляцию</button>
+        <button id="start-button">Запустить Симуляцию</button>
         <div id="output"></div>
         <div id="confirm-box">
             <p>ДОСТУП РАЗБЛОКИРОВАН. Войти в <i>Свиток III½</i>?</p>
@@ -82,5 +110,15 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+        document.getElementById('start-button').addEventListener('click', () => {
+            try {
+                startSimulation();
+            } catch (e) {
+                console.error('Simulation failed:', e);
+                alert('Ошибка запуска симуляции. Проверьте консоль браузера.');
+            }
+        });
+    </script>
 </body>
 </html>
