@@ -8,6 +8,12 @@ const memoryFragments = [
     "BOY: her_eyes_in_his"
 ];
 
+const readerTraumaProfile = [
+    "MOTHER: you_drove_me_to_pills",
+    "CHURCH: holy_water_as_blood",
+    "TUNNEL: walls_breathe_her_tears"
+];
+
 const events = [
     {
         id: "night_ride",
@@ -53,9 +59,8 @@ const events = [
     }
 ];
 
-let traumaCount = 0;
-const errorRate = 0.6; // 60% chance of glitch
-const unlockThreshold = 3;
+let traumaAlignmentCount = 0;
+const alignmentThreshold = 3;
 const connectionDropRate = 0.2; // 20% chance of connection drop per event
 let outputDiv = null;
 let isSimulating = false;
@@ -80,13 +85,13 @@ function typeWriter(text, callback) {
     type();
 }
 
-function getRandomMemory() {
-    return `ERROR: MEMORY_CORRUPTED_${memoryFragments[Math.floor(Math.random() * memoryFragments.length)]}`;
+function getRandomServerTrauma() {
+    return memoryFragments[Math.floor(Math.random() * memoryFragments.length)];
 }
 
-async function simulatePing() {
+async function simulateConnection() {
     outputDiv.innerHTML = '';
-    await typeWriter('[NEURALINK] Pinging neuralink-server.texas.usa [192.168.1.100]...', () => {});
+    await typeWriter('[NEURALINK] Establishing connection from DEVICE: USER_LOCAL to neuralink-server.texas.usa [192.168.1.100]...', () => {});
     let attempts = 0;
     while (attempts < 3) {
         await sleep(500);
@@ -105,6 +110,7 @@ async function simulatePing() {
         await sleep(1000);
     }
     await typeWriter('[NEURALINK] Connected successfully.', () => {});
+    await typeWriter('[NEURALINK] Scanning psyche for trauma resonance...', () => {});
     await sleep(500);
     outputDiv.innerHTML = '';
 }
@@ -137,22 +143,26 @@ async function processEvent(event) {
         await typeWriter(`[TRIGGER] ${event.trigger}`, () => {});
         await typeWriter(`[NEURALINK] Processing: ${event.id}`, () => {});
         await sleep(500);
-        if (traumaCount < unlockThreshold && Math.random() < errorRate) {
-            const horror = getRandomMemory();
-            await typeWriter(`[HORROR] Trauma detected: ${horror}`, () => {});
-            traumaCount++;
-            await typeWriter(`[DEBUG] Traumatic glitches: ${traumaCount}/${unlockThreshold}`, () => {});
-            if (traumaCount >= unlockThreshold) {
-                await typeWriter('=====================================', () => {});
-                await typeWriter('[NEURALINK] ACCESS UNLOCKED: Hidden Chapter', () => {});
-                await typeWriter('[HORROR] The tunnel breathes, her voice tears through the mind!', () => {});
-                await typeWriter('=====================================', () => {});
-                document.getElementById('confirm-box').style.display = 'block';
-                outputDiv.scrollTop = outputDiv.scrollHeight;
-                return "ACCESS//HIDDEN_CHAPTER";
+        if (traumaAlignmentCount < alignmentThreshold) {
+            const serverTrauma = getRandomServerTrauma();
+            await typeWriter(`[NEURALINK] Server trauma detected: ${serverTrauma}`, () => {});
+            if (readerTraumaProfile.includes(serverTrauma)) {
+                traumaAlignmentCount++;
+                await typeWriter(`[TRAUMA] Alignment confirmed: ${serverTrauma} - Alignment: ${traumaAlignmentCount}/${alignmentThreshold}`, () => {});
+                if (traumaAlignmentCount >= alignmentThreshold) {
+                    await typeWriter('=====================================', () => {});
+                    await typeWriter('[NEURALINK] TRAUMA ALIGNMENT COMPLETE: Hidden Chapter Unlocked', () => {});
+                    await typeWriter('[TRAUMA] The tunnel breathes, her voice tears through the psyche!', () => {});
+                    await typeWriter('=====================================', () => {});
+                    document.getElementById('confirm-box').style.display = 'block';
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                    return "ACCESS//HIDDEN_CHAPTER";
+                }
+            } else {
+                await typeWriter('[NEURALINK] No alignment. Psyche mismatch.', () => {});
             }
-            await typeWriter('[RESULT] Action: LOOP//TRAUMA_NIGHTMARE', () => {});
-            return "LOOP//TRAUMA_NIGHTMARE";
+            await typeWriter(`[RESULT] Action: ${event.action}`, () => {});
+            return event.action;
         }
         await typeWriter(`[NEURALINK] Status: Processed, Action: ${event.action}`, () => {});
         await typeWriter(`[RESULT] Action: ${event.action}`, () => {});
@@ -171,10 +181,10 @@ async function startSimulation() {
     document.getElementById('confirm-box').style.display = 'none';
     outputDiv = document.getElementById('output');
     outputDiv.innerHTML = '';
-    traumaCount = 0;
+    traumaAlignmentCount = 0;
     try {
-        await simulatePing();
-        await typeWriter('[NEURALINK] Starting simulation...', async () => {
+        await simulateConnection();
+        await typeWriter('[NEURALINK] Starting psyche alignment simulation...', async () => {
             for (let event of events) {
                 const action = await processEvent(event);
                 await typeWriter('------------------------------------------------------------', () => {});
@@ -193,7 +203,7 @@ async function startSimulation() {
 
 function confirmChapter(confirmed) {
     if (confirmed) {
-        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view';
+        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMiKUZlFl0zI/view';
     } else {
         window.location.href = 'https://t.me/santabeansreserveandlab';
     }
@@ -204,4 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startButton) {
         startButton.addEventListener('click', () => {
             console.log('Start button clicked.');
-            startSimulation
+            startSimulation();
+        });
+    } else {
+        console.error('Start button not found.');
+        alert('Error: Start button not found. Please refresh the page.');
+    }
+});
