@@ -30,17 +30,17 @@
         h1 {
             color: #ff0000;
             text-align: center;
-            font-size: 5vw;
+            font-size: 6vw;
             margin-bottom: 2vw;
         }
         p {
-            font-size: 3.5vw;
+            font-size: 4vw;
             line-height: 1.4;
             margin-bottom: 2vw;
         }
         #output {
             white-space: pre-wrap;
-            font-size: 3vw;
+            font-size: 3.5vw;
             background: #1a1a1a;
             padding: 2vw;
             border: 1px solid #ff0000;
@@ -53,12 +53,25 @@
             color: #ff0000;
             font-weight: bold;
         }
+        .glitch {
+            color: #ff0000;
+            font-size: 3.5vw;
+            animation: glitch 0.2s infinite;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
         .unlock {
             border: 2px solid #ff0000;
             padding: 2vw;
             background: #1a1a1a;
             margin-top: 2vw;
-            font-size: 3.5vw;
+            font-size: 4vw;
         }
         a {
             color: #ff0000;
@@ -73,7 +86,7 @@
             border: none;
             padding: 2vw 4vw;
             font-family: 'Courier New', monospace;
-            font-size: 4vw;
+            font-size: 5vw;
             cursor: pointer;
             margin: 2vw 0;
             width: 100%;
@@ -85,12 +98,13 @@
         #confirm-box {
             display: none;
             text-align: center;
-            font-size: 3.5vw;
+            font-size: 4vw;
         }
         @media (min-width: 768px) {
-            h1 { font-size: 3rem; }
+            h1 { font-size: 2.5rem; }
             p { font-size: 1.2rem; }
             #output { font-size: 1rem; }
+            .glitch { font-size: 1rem; }
             .unlock { font-size: 1.2rem; }
             button { font-size: 1.5rem; padding: 10px 20px; width: auto; }
             #confirm-box { font-size: 1.2rem; }
@@ -100,7 +114,7 @@
 <body>
     <div id="container">
         <h1>Нейролинк: Симуляция Психики Андрея</h1>
-        <p>Запустите симуляцию, чтобы пройти через психику Андрея и открыть <i>Свиток III½: Суд на берегу Стикса</i>. Следите за гличями "[УЖАС]".</p>
+        <p>Запустите симуляцию, чтобы пройти через психику Андрея и открыть <i>Свиток III½: Суд на берегу Стикса</i>. Следите за гличами "[УЖАС]".</p>
         <button id="start-button">Запустить Симуляцию</button>
         <div id="output"></div>
         <div id="confirm-box">
@@ -110,15 +124,5 @@
         </div>
     </div>
     <script src="script.js"></script>
-    <script>
-        document.getElementById('start-button').addEventListener('click', () => {
-            try {
-                startSimulation();
-            } catch (e) {
-                console.error('Simulation failed:', e);
-                alert('Ошибка запуска симуляции. Проверьте консоль браузера.');
-            }
-        });
-    </script>
 </body>
 </html>
