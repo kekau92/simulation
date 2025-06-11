@@ -34,10 +34,12 @@
             font-size: 6vw;
             margin-bottom: 2vw;
         }
-        p {
-            font-size: 4vw;
+        #intro {
+            font-size: 3.5vw;
             line-height: 1.4;
             margin-bottom: 2vw;
+            white-space: pre-wrap;
+            color: #ff0000;
         }
         #output {
             white-space: pre-wrap;
@@ -47,6 +49,7 @@
             height: 60vh;
             overflow-y: auto;
             margin-bottom: 2vw;
+            border: 1px solid #ff0000;
         }
         .horror {
             color: #ff0000;
@@ -77,10 +80,26 @@
             text-align: center;
             font-size: 4vw;
             margin-top: 2vw;
+            position: sticky;
+            bottom: 0;
+            background: #000000;
+            padding: 2vw;
+        }
+        @media (max-width: 767px) {
+            #output {
+                height: 50vh;
+            }
+            #intro {
+                font-size: 3vw;
+            }
+            button {
+                font-size: 4.5vw;
+                padding: 1.5vw 3vw;
+            }
         }
         @media (min-width: 768px) {
             h1 { font-size: 2.5rem; }
-            p { font-size: 1.2rem; }
+            #intro { font-size: 1rem; }
             #output { font-size: 1rem; }
             .unlock { font-size: 1.2rem; }
             button { font-size: 1.5rem; padding: 10px 20px; width: auto; }
@@ -91,8 +110,17 @@
 <body>
     <div id="container">
         <h1>Нейролинк: Симуляция Психики Андрея</h1>
-        <p>Запустите симуляцию, чтобы пройти через психику Андрея и открыть скрытую главу. Следите за гличями "[HORROR]".</p>
-        <button id="start-button">Запустить Симуляцию</button>
+        <div id="intro">
+> Попытка: взаимно стабилизировать нервную систему...  
+> Результат: частичный успех.  
+> Формируется биохимическая петля...  
+> Источник: знакомая травма → реакция страха → всплеск дофамина  
+> Цикл устойчив. Саморазрушение маскируется под близость.
+
+> Запустите симуляцию, чтобы пройти через психику Андрея и открыть скрытую главу.  
+> [НАЖМИТЕ ENTER]
+        </div>
+        <button id="start-button">ENTER</button>
         <div id="output"></div>
         <div id="confirm-box">
             <p>ДОСТУП РАЗБЛОКИРОВАН. Войти в скрытую главу?</p>
