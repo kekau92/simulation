@@ -41,20 +41,35 @@ function sleep(ms) {
 }
 
 function typeWriter(text, callback) {
-    outputDiv.textContent = ''; // Clear output
-    let i = 0;
-    function type() {
-        if (i < text.length) {
-            outputDiv.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, 30);
-        } else {
-            outputDiv.textContent += '\n';
-            outputDiv.scrollTop = outputDiv.scrollHeight;
+    if (!outputDiv) return;
+    const lines = text.split('\n');
+    let currentLine = 0;
+    
+    function writeLine() {
+        if (currentLine < lines.length) {
+            const line = lines[currentLine];
+            let i = 0;
+            
+            function typeChar() {
+                if (i < line.length) {
+                    outputDiv.textContent += line.charAt(i);
+                    i++;
+                    setTimeout(typeChar, 30);
+                } else {
+                    outputDiv.textContent += '\n';
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                    currentLine++;
+                    setTimeout(writeLine, 100);
+                }
+            }
+            
+            typeChar();
+        } else if (callback) {
             callback();
         }
     }
-    type();
+    
+    writeLine();
 }
 
 function getRandomServerTrauma() {
@@ -62,24 +77,41 @@ function getRandomServerTrauma() {
 }
 
 async function simulateConnection() {
-    await typeWriter(postClickIntro, async () => {
-        await sleep(500);
-        await typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server...', async () => {
-            await sleep(500);
-            await typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', async () => {
-                await sleep(500);
-                await typeWriter('[NEURALINK] Connected. Scanning psyche...', () => {});
-            });
-        });
+    await new Promise(resolve => {
+        typeWriter(postClickIntro, resolve);
+    });
+    
+    await sleep(500);
+    
+    await new Promise(resolve => {
+        typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server...', resolve);
+    });
+    
+    await sleep(500);
+    
+    await new Promise(resolve => {
+        typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'msms', resolve);
+    });
+    
+    await sleep(500);
+    
+    await new Promise(resolve => {
+        typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
     });
 }
 
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
-        await typeWriter('[NEURALINK] Connection lost. Retrying...', async () => {
-            await sleep(1000);
-            await typeWriter('[NEURALINK] Connection restored.', () => {});
+        await new Promise(resolve => {
+            typeWriter('[NEURALINK] Connection lost. Retry...', resolve);
         });
+        
+        await sleep(1200);
+        
+        await new Promise(resolve => {
+            typeWriter('[NEURALINK] Connection restored.', resolve);
+        });
+        
         return true;
     }
     return false;
@@ -89,59 +121,108 @@ async function processEvent(event) {
     if (await simulateConnectionDrop()) {
         await sleep(500);
     }
-    await typeWriter(`[EVENT] ${event.desc}`, () => {});
-    await typeWriter(`[TRIGGER] ${event.trigger}`, () => {});
+    
+    await new Promise(resolve => {
+        typeWriter(`\n[EVENT] ${event.desc}`, resolve);
+    });
+    
+    await new Promise(resolve => {
+        typeWriter(`[TRIGGER] ${event.trigger}`, resolve);
+    });
+    
     await sleep(500);
+    
     if (traumaAlignmentCount < alignmentThreshold) {
         const serverTrauma = getRandomServerTrauma();
-        await typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, () => {});
+        
+        await new Promise(resolve => {
+            typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, resolve);
+        });
+        
         if (readerTraumaProfile.includes(serverTrauma)) {
             traumaAlignmentCount++;
-            await typeWriter(`[TRAUMA] Aligned: ${serverTrauma} (${traumaAlignmentCount}/${alignmentThreshold})`, () => {});
+            
+            await new Promise(resolve => {
+                typeWriter(`[TRAUMA] Aligned: ${serverTrauma} (${traumaAlignmentCount}/${alignmentThreshold})`, resolve);
+            });
+            
             if (traumaAlignmentCount >= alignmentThreshold) {
-                await typeWriter('=================', () => {});
-                await typeWriter('[NEURALINK] ACCESS UNLOCKED', () => {});
-                await typeWriter('[TRAUMA] Her voice tears through!', () => {});
-                await typeWriter('=================', () => {});
+                await new Promise(resolve => {
+                    typeWriter('\n-----------------', resolve);
+                });
+                
+                await new Promise(resolve => {
+                    typeWriter('[NEURALINK] ACCESS UNLOCKED', resolve);
+                });
+                
+                await new Promise(resolve => {
+                    typeWriter('[TRAUMA] Her voice tears through!', resolve);
+                });
+                
+                await new Promise(resolve => {
+                    typeWriter('-----------------', resolve);
+                });
+                
                 document.getElementById('confirm-box').style.display = 'block';
                 outputDiv.scrollTop = outputDiv.scrollHeight;
-                return "ACCESS";
+                return true;
             }
         } else {
-            await typeWriter('[NEURALINK] No alignment.', () => {});
+            await new Promise(resolve => {
+                typeWriter('[NEURALINK] No alignment.', resolve);
+            });
         }
     }
-    outputDiv.scrollTop = outputDiv.scrollHeight;
 }
 
 async function startSimulation() {
     if (isSimulating) return;
     isSimulating = true;
     console.log('Simulation started');
+    
+    const startButton = document.getElementById('start-button');
+    startButton.textContent = "ПОДКЛЮЧЕНИЕ...";
+    startButton.disabled = true;
+    
     outputDiv = document.getElementById('output');
+    outputDiv.textContent = '';
     document.getElementById('confirm-box').style.display = 'none';
     traumaAlignmentCount = 0;
+    
     try {
         await simulateConnection();
-        await sleep(500);
+        
         for (let event of events) {
-            await processEvent(event);
-            await typeWriter('-----', () => {});
-            if (traumaAlignmentCount >= alignmentThreshold) break;
+            const result = await processEvent(event);
+            if (result) break;
+            
+            await new Promise(resolve => {
+                typeWriter('----------------------------------------', resolve);
+            });
             await sleep(1000);
         }
-        isSimulating = false;
-        console.log('Simulation ended');
+        
+        if (traumaAlignmentCount < alignmentThreshold) {
+            await new Promise(resolve => {
+                typeWriter('\n[NEURALINK] Insufficient trauma alignment.', resolve);
+            });
+        }
     } catch (e) {
         console.error('Error:', e);
-        await typeWriter(`[ERROR] Failed: ${e.message}`, () => {});
+        await new Promise(resolve => {
+            typeWriter(`[ERROR] Failed: ${e.message}`, resolve);
+        });
+    } finally {
+        startButton.textContent = "ПЕРЕЗАПУСТИТЬ";
+        startButton.disabled = false;
         isSimulating = false;
+        console.log('Simulation ended');
     }
 }
 
 function confirmChapter(confirmed) {
     if (confirmed) {
-        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view';
+        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMiKUZlFl0zI/view';
     } else {
         window.location.href = 'https://t.me/santabeansreserveandlab';
     }
@@ -160,4 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Start button missing');
         alert('Error: Button not found. Refresh page.');
     }
+    
+    const confirmYes = document.getElementById('confirm-yes');
+    const confirmNo = document.getElementById('confirm-no');
+    confirmYes.addEventListener('click', () => confirmChapter(true));
+    confirmNo.addEventListener('click', () => confirmChapter(false));
 });
