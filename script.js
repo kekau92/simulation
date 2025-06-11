@@ -1,26 +1,21 @@
 const postClickIntro = `> Попытка: взаимно стабилизировать нервную систему...
 > Результат: частичный успех.
 > Требуется 3 из 3 совпадений:
-    [✓] Амигдала — отклик на угрозу
-    [✓] Гиппокамп — фрагмент контекста распознан
-    [✗] Префронтальная кора — активность недостаточна
-
+[✓] Амигдала — отклик на угрозу
+[✓] Гиппокамп — фрагмент контекста распознан
+[✗] Префронтальная кора — активность недостаточна
 > Формируется биохимическая петля...
 > Источник: знакомая травма → реакция страха → всплеск дофамина
 > Поведение: компульсивное сближение → активация схемы спасения → углубление зависимости
-
 > Цикл устойчив. Саморазрушение маскируется под близость.
-
 > Внутренний отклик:
-    - Инсула: частичная диссоциация, соматическая спутанность
-    - Амигдала: уровень тревоги ↑↑
-    - Префронтальная кора: связь с реальностью нестабильна
-
+- Инсула: частичная диссоциация, соматическая спутанность
+- Амигдала: уровень тревоги ↑↑
+- Префронтальная кора: связь с реальностью нестабильна
 > Доступ к скрытой памяти возможен.
 > Условие: принудительная активация всей триады — страх, контекст, рационализация
-
 > Запрос:
-    >> Войти в травматическое воспоминание`;
+>> Войти в травматическое воспоминание`;
 
 const memoryFragments = [
     "MIRROR: empty_label_no_face",
@@ -74,7 +69,8 @@ function typeWriter(text, callback) {
     
     function writeLine() {
         if (currentLine < lines.length) {
-            const line = lines[currentLine];
+            // Trim leading spaces for consistent alignment, but preserve intentional formatting
+            const line = lines[currentLine].replace(/^\s+/, line => line.match(/^(\s*[-[✓✗>]|\s*\>)/) ? line : '');
             let i = 0;
             
             function typeChar() {
@@ -107,7 +103,7 @@ function typeWriterWithLink(text, linkText, url, callback) {
     
     function writeLine() {
         if (currentLine < lines.length) {
-            const line = lines[currentLine];
+            const line = lines[currentLine].replace(/^\s+/, '');
             if (line.includes(linkText)) {
                 const parts = line.split(linkText);
                 typeWriter(parts[0], () => {
@@ -148,32 +144,32 @@ async function simulateConnection() {
     await sleep(500);
     
     await new Promise(resolve => {
-        typeWriter('[NEUROLINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
+        typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
     });
     
     await sleep(800);
     
     await new Promise(resolve => {
-        typeWriter('[NEUROLINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
+        typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
     });
     
     await sleep(600);
     
     await new Promise(resolve => {
-        typeWriter('[NEUROLINK] Connected. Scanning psyche...', resolve);
+        typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
     });
 }
 
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
         await new Promise(resolve => {
-            typeWriter('[NEUROLINK] Connection lost. Retrying...', resolve);
+            typeWriter('[NEURALINK] Connection lost. Retrying...', resolve);
         });
         
         await sleep(1200);
         
         await new Promise(resolve => {
-            typeWriter('[NEUROLINK] Connection restored.', resolve);
+            typeWriter('[NEURALINK] Connection restored.', resolve);
         });
         
         return true;
@@ -200,7 +196,7 @@ async function processEvent(event) {
         const serverTrauma = getRandomServerTrauma();
         
         await new Promise(resolve => {
-            typeWriter(`[NEUROLINK] Trauma: ${serverTrauma}`, resolve);
+            typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, resolve);
         });
         
         if (readerTraumaProfile.includes(serverTrauma)) {
@@ -216,7 +212,7 @@ async function processEvent(event) {
                 });
                 
                 await new Promise(resolve => {
-                    typeWriter('[NEUROLINK] ACCESS UNLOCKED', resolve);
+                    typeWriter('[NEURALINK] ACCESS UNLOCKED', resolve);
                 });
                 
                 await new Promise(resolve => {
@@ -226,7 +222,7 @@ async function processEvent(event) {
                 await new Promise(resolve => {
                     typeWriterWithLink('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
                         'ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
-                        'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
+                        'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
                         resolve);
                 });
                 
@@ -234,7 +230,7 @@ async function processEvent(event) {
             }
         } else {
             await new Promise(resolve => {
-                typeWriter('[NEUROLINK] No alignment.', resolve);
+                typeWriter('[NEURALINK] No alignment.', resolve);
             });
         }
     }
@@ -268,19 +264,16 @@ async function startSimulation() {
         
         if (traumaAlignmentCount < alignmentThreshold) {
             await new Promise(resolve => {
-                typeWriter('\n> [NEUROLINK] Недостаточное совпадение травмы. Доступ запрещён.
->  Insufficient trauma alignment. Access denied.
-
+                typeWriter(`\n> [NEURALINK] Недостаточное совпадение травмы. Доступ запрещён.
+> Insufficient trauma alignment. Access denied.
 > Возможные причины:
-    - Эмоциональное подавление
-    - Нарушена связь между телесными ощущениями и воспоминаниями
-    - Триггер активирует имитацию, а не подлинное ядро травмы
-
+- Эмоциональное подавление
+- Нарушена связь между телесными ощущениями и воспоминаниями
+- Триггер активирует имитацию, а не подлинное ядро травмы
 > Рекомендация:
-    >> Восстановить сенсорный след (через запах, звук, голос)
-    >> Запросить внешний стимул для разблокировки памяти
-
-> Повторить попытку подключения', resolve);
+>> Восстановить сенсорный след (через запах, звук, голос)
+>> Запросить внешний стимул для разблокировки памяти
+> Повторить попытку подключения`, resolve);
             });
         }
     } catch (e) {
