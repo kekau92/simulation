@@ -4,18 +4,83 @@
     <meta charset="UTF-8">
     <title>Нейролинк: Симуляция Психики Андрея</title>
     <style>
-        body { background: #1a1a1a; color: #e0e0e0; font-family: 'Courier New', monospace; padding: 20px; }
-        #output { white-space: pre-wrap; font-size: 14px; }
-        .horror { color: #ff4040; font-weight: bold; }
-        .unlock { border: 2px solid #ff4040; padding: 10px; background: #2a2a2a; }
-        a { color: #40c4ff; }
+        body {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            margin: 0;
+        }
+        #container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff4040;
+            text-align: center;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        #output {
+            white-space: pre-wrap;
+            font-size: 14px;
+            background: #2a2a2a;
+            padding: 15px;
+            border: 1px solid #ff4040;
+            border-radius: 5px;
+            min-height: 400px;
+            overflow-y: auto;
+        }
+        .horror {
+            color: #ff4040;
+            font-weight: bold;
+        }
+        .unlock {
+            border: 2px solid #ff4040;
+            padding: 10px;
+            background: #2a2a2a;
+            margin-top: 10px;
+        }
+        a {
+            color: #40c4ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        button {
+            background: #ff4040;
+            color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #cc3333;
+        }
+        #confirm-box {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <h1>Нейролинк: Симуляция Психики Андрея</h1>
-    <p>Запустите симуляцию, чтобы открыть <i>Свиток III½: Суд на берегу Стикса</i>.</p>
-    <button onclick="runSimulation()">Запустить Симуляцию</button>
-    <div id="output"></div>
+    <div id="container">
+        <h1>Нейролинк: Симуляция Психики Андрея</h1>
+        <p>Запустите симуляцию, чтобы пройти через психику Андрея и открыть <i>Свиток III½: Суд на берегу Стикса</i>. Следите за гличями "[УЖАС]".</p>
+        <button onclick="startSimulation()">Запустить Симуляцию</button>
+        <div id="output"></div>
+        <div id="confirm-box">
+            <p>ДОСТУП РАЗБЛОКИРОВАН. Войти в <i>Свиток III½</i>?</p>
+            <button onclick="confirmChapter(true)">Подтвердить</button>
+            <button onclick="confirmChapter(false)">Отклонить</button>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
