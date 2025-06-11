@@ -53,6 +53,13 @@ const events = [
     }
 ];
 
+const glitchChars = [
+    "̴͓̻̰͇̱̲Н̷̛̫̼̘̼Е̶̮̜̯͝Й̴̛̳̙̗Р̵̛̺̤̰О̷̛̜̘Л̴̛̳̙̗И̵̛̺̤̰Н̷̛̫̼̘̼К̶̮̜̯͝",
+    "̵̢̳̻̝̦͓̰̲Z̴̢̡̫̮̙͚̻̦A̵̢̠̺̝͓̺L̴̢̢̡̳̖̪̺̰G̵̢̢̳̫̙O̴̢̠̝̱̙",
+    "̸̡̝̻̫̜̳̰͠C̵̢̡̳̖̪̺O̴̢̠̝̱̙R̵̢̳̻̝̦͓R̴̢̡̫̮̙͚U̵̢̠̺̝͓̺P̴̢̢̡̳̖̪T̵̢̢̳̫̙",
+    "̶̴̡̝̻̫̜̳̰͓̻̰͇̱̲E̷̛̫̼̘̼R̶̮̜̯͝R̴̛̳̙̗Ơ̵̺̤̰R̷̛̜̘_̴̛̳̙̗M̵̛̺̤̰E̷̛̫̼̘̼M̶̮̜̯͝"
+];
+
 let traumaCount = 0;
 const errorRate = 0.6; // 60% chance of glitch
 const unlockThreshold = 3;
@@ -69,7 +76,7 @@ function typeWriter(text, callback) {
         if (i < text.length) {
             outputDiv.innerHTML += text.charAt(i);
             i++;
-            setTimeout(type, 30); // Faster typing for mobile
+            setTimeout(type, 30);
         } else {
             outputDiv.innerHTML += '\n';
             callback();
@@ -80,6 +87,20 @@ function typeWriter(text, callback) {
 
 function getRandomMemory() {
     return `ОШИБКА: ПАМЯТЬ_ИСКАЖЕНА_${memoryFragments[Math.floor(Math.random() * memoryFragments.length)]}`;
+}
+
+function getRandomGlitch() {
+    return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+}
+
+async function showGlitchEffect() {
+    if (window.innerWidth < 768) return; // Skip on mobile
+    outputDiv.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+        outputDiv.innerHTML = `<span class="glitch">${getRandomGlitch()}</span>`;
+        await sleep(200);
+    }
+    outputDiv.innerHTML = '';
 }
 
 async function processEvent(event) {
@@ -118,11 +139,12 @@ async function processEvent(event) {
 async function startSimulation() {
     if (isSimulating) return;
     isSimulating = true;
+    console.log('Starting simulation...');
     document.getElementById('confirm-box').style.display = 'none';
     outputDiv = document.getElementById('output');
-    outputDiv.innerHTML = '';
     traumaCount = 0;
     try {
+        await showGlitchEffect();
         await typeWriter('[НЕЙРОЛИНК] Запуск симуляции...', async () => {
             for (let event of events) {
                 const action = await processEvent(event);
@@ -131,6 +153,7 @@ async function startSimulation() {
                 await sleep(1000);
             }
             isSimulating = false;
+            console.log('Simulation completed.');
         });
     } catch (e) {
         console.error('Simulation error:', e);
@@ -139,13 +162,14 @@ async function startSimulation() {
     }
 }
 
-function confirmChapter(confirmed) {
-    outputDiv = document.getElementById('output');
-    document.getElementById('confirm-box').style.display = 'none';
-    if (confirmed) {
-        outputDiv.innerHTML += `\n[ССЫЛКА] Читайте скрытую главу: <a href="https://raw.githubusercontent.com/tekau82/kniqsa-andreya/main/%D0%A1%D0%B2%D0%B8%D1%82%D0%BE%D0%BA%20III%C2%BD_%20%D0%A1%D1%83%D0%B4%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D1%80%D0%B5%D0%B3%D1%83%20%D0%A1%D1%82%D0%B8%D0%BA%D1%81%D0%B0.pdf" target="_blank">Свиток III½</a>\n`;
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('start-button');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            console.log('Start button clicked.');
+            startSimulation();
+        });
     } else {
-        outputDiv.innerHTML += `\n[НЕЙРОЛИНК] Доступ отклонён. Прочтите историю снова, чтобы подготовиться.\n`;
+        console.error('Start button not found.');
     }
-    outputDiv.scrollTop = outputDiv.scrollHeight;
-}
+});
