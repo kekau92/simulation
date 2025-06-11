@@ -222,7 +222,7 @@ async function processEvent(event) {
                 await new Promise(resolve => {
                     typeWriterWithLink('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
                         'ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
-                        'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
+                        'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
                         resolve);
                 });
                 
