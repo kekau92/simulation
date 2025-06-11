@@ -28,13 +28,23 @@ const memoryFragments = [
     "OFFICE: hollow_chest_echo",
     "BICYCLE: carbon_crucifixion",
     "COFFEE: mourning_brew_sips",
-    "ORLENOK: rusty_bones_bell"
+    "ORLENOK: rusty_bones_bell",
+    "SHADOW: footsteps_in_fog",
+    "RIVER: cold_mud_clings",
+    "ROOM: wallpaper_peels_screams",
+    "CANDLE: wax_drips_like_tears"
 ];
 
 const readerTraumaProfile = [
     "MOTHER: you_drove_me_to_pills",
     "CHURCH: holy_water_as_blood",
-    "TUNNEL: walls_breathe_her_tears"
+    "TUNNEL: walls_breathe_her_tears",
+    "PAIN: hot_wire_in_thigh",
+    "BOY: her_eyes_in_his",
+    "COFFEE: mourning_brew_sips",
+    "SHADOW: footsteps_in_fog",
+    "RIVER: cold_mud_clings",
+    "CANDLE: wax_drips_like_tears"
 ];
 
 const events = [
@@ -48,7 +58,16 @@ const events = [
     { id: "office_procol", desc: "Офис гудит пустотой.", trigger: "Шёпот: 'Ты не здесь.'" },
     { id: "peloton_call", desc: "Чёрный Пелотон зовёт.", trigger: "Уведомление: 'Исповедь.'" },
     { id: "coffee_ritual", desc: "Траурный напиток в кафе.", trigger: "Взгляд: 'Чужой.'" },
-    { id: "orlenok_vision", desc: "Орлёнок на пустой дороге.", trigger: "Звонок: 'Смех травы.'" }
+    { id: "orlenok_vision", desc: "Орлёнок на пустой дороге.", trigger: "Звонок: 'Смех травы.'" },
+    { id: "fog_encounter", desc: "Тень в тумане за спиной.", trigger: "Шаги: 'Ближе.'" },
+    { id: "mud_trap", desc: "Ноги вязнут в речной грязи.", trigger: "Холод: 'Не двигайся.'" },
+    { id: "wall_scream", desc: "Обои в комнате шепчут.", trigger: "Звук: 'Разорви.'" },
+    { id: "candle_flicker", desc: "Свеча гаснет в темноте.", trigger: "Запах: 'Воск и страх.'" },
+    { id: "mirror_void", desc: "Зеркало не отражает лица.", trigger: "Тишина: 'Кто ты?'" },
+    { id: "phone_static", desc: "Телефон шипит её голосом.", trigger: "Сигнал: 'Вернись.'" },
+    { id: "bridge_creak", desc: "Мост скрипит под шагами.", trigger: "Эхо: 'Падение.'" },
+    { id: "clock_ticking", desc: "Часы тикают в пустоте.", trigger: "Ритм: 'Беги.'" },
+    { id: "door_scratch", desc: "Царапины на двери изнутри.", trigger: "Звук: 'Открой.'" }
 ];
 
 let traumaAlignmentCount = 0;
@@ -69,7 +88,6 @@ function typeWriter(text, callback) {
     
     function writeLine() {
         if (currentLine < lines.length) {
-            // Trim leading spaces for consistent alignment, but preserve intentional formatting
             const line = lines[currentLine].replace(/^\s+/, line => line.match(/^(\s*[-[✓✗>]|\s*\>)/) ? line : '');
             let i = 0;
             
@@ -77,12 +95,12 @@ function typeWriter(text, callback) {
                 if (i < line.length) {
                     outputDiv.textContent += line.charAt(i);
                     i++;
-                    setTimeout(typeChar, 15);
+                    setTimeout(typeChar, 10);
                 } else {
                     outputDiv.textContent += '\n';
                     outputDiv.scrollTop = outputDiv.scrollHeight;
                     currentLine++;
-                    setTimeout(writeLine, 50);
+                    setTimeout(writeLine, 30);
                 }
             }
             
@@ -116,12 +134,12 @@ function typeWriterWithLink(text, linkText, url, callback) {
                     outputDiv.appendChild(document.createTextNode('\n'));
                     outputDiv.scrollTop = outputDiv.scrollHeight;
                     currentLine++;
-                    setTimeout(writeLine, 50);
+                    setTimeout(writeLine, 30);
                 });
             } else {
                 typeWriter(line, () => {
                     currentLine++;
-                    setTimeout(writeLine, 50);
+                    setTimeout(writeLine, 30);
                 });
             }
         } else if (callback) {
@@ -141,19 +159,19 @@ async function simulateConnection() {
         typeWriter(postClickIntro, resolve);
     });
     
-    await sleep(500);
+    await sleep(300);
     
     await new Promise(resolve => {
         typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
     });
     
-    await sleep(800);
+    await sleep(500);
     
     await new Promise(resolve => {
         typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
     });
     
-    await sleep(600);
+    await sleep(400);
     
     await new Promise(resolve => {
         typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
@@ -166,7 +184,7 @@ async function simulateConnectionDrop() {
             typeWriter('[NEURALINK] Connection lost. Retrying...', resolve);
         });
         
-        await sleep(1200);
+        await sleep(800);
         
         await new Promise(resolve => {
             typeWriter('[NEURALINK] Connection restored.', resolve);
@@ -179,7 +197,7 @@ async function simulateConnectionDrop() {
 
 async function processEvent(event) {
     if (await simulateConnectionDrop()) {
-        await sleep(500);
+        await sleep(300);
     }
     
     await new Promise(resolve => {
@@ -190,16 +208,25 @@ async function processEvent(event) {
         typeWriter(`[TRIGGER] ${event.trigger}`, resolve);
     });
     
-    await sleep(700);
+    await sleep(500);
     
     if (traumaAlignmentCount < alignmentThreshold) {
-        const serverTrauma = getRandomServerTrauma();
+        let serverTrauma = getRandomServerTrauma();
         
         await new Promise(resolve => {
             typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, resolve);
         });
         
-        if (readerTraumaProfile.includes(serverTrauma)) {
+        let isAligned = readerTraumaProfile.includes(serverTrauma);
+        if (!isAligned && Math.random() < 0.5) {
+            serverTrauma = readerTraumaProfile[Math.floor(Math.random() * readerTraumaProfile.length)];
+            isAligned = true;
+            await new Promise(resolve => {
+                typeWriter(`[NEURALINK] Forced alignment: ${serverTrauma}`, resolve);
+            });
+        }
+        
+        if (isAligned) {
             traumaAlignmentCount++;
             
             await new Promise(resolve => {
@@ -222,7 +249,7 @@ async function processEvent(event) {
                 await new Promise(resolve => {
                     typeWriterWithLink('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
                         'ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
-                        'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
+                        'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
                         resolve);
                 });
                 
@@ -259,7 +286,7 @@ async function startSimulation() {
                 typeWriter('----------------------------------------', resolve);
             });
             
-            await sleep(1000);
+            await sleep(600);
         }
         
         if (traumaAlignmentCount < alignmentThreshold) {
