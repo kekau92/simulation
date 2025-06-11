@@ -1,3 +1,9 @@
+const postClickIntro = `> Попытка: взаимно стабилизировать нервную систему...
+> Результат: частичный успех.
+> Формируется биохимическая петля...
+> Источник: знакомая травма → реакция страха → всплеск дофамина
+> Цикл устойчив. Саморазрушение маскируется под близость.`;
+
 const memoryFragments = [
     "MIRROR: empty_label_no_face",
     "MOTHER: you_drove_me_to_pills",
@@ -8,55 +14,25 @@ const memoryFragments = [
     "BOY: her_eyes_in_his"
 ];
 
-const events = [
-    {
-        id: "night_ride",
-        desc: "Андрей мчится на 'Стрекозе' по ночному шоссе, теряя контроль. Вопросы гудят: 'Зачем я еду? Ради кого?'",
-        trigger: "Детский смех и тень в рваных кедах на обочине.",
-        action: "ПРОДОЛЖИТЬ_ЕЗДУ"
-    },
-    {
-        id: "window_frame",
-        desc: "Разбитая оконная рама у дороги вызывает память о холодном стекле, прижатом ко лбу, и ржавом дворе.",
-        trigger: "Голос Гравий-Вилдада: 'Дропни руль и плачь.'",
-        action: "ИСКАТЬ_ЗНАКИ"
-    },
-    {
-        id: "mothers_voice",
-        desc: "Голос матери: 'Посмотри на Витьку, а ты в сопли уткнулся!' Андрей едет, чтобы сжечь детские страхи.",
-        trigger: "Унижение: 'Мужиком растили - бабой вырос!'",
-        action: "КРУТИТЬ_СИЛЬНЕЕ"
-    },
-    {
-        id: "muscle_spasm",
-        desc: "Судорога в ноге останавливает Андрея. Гравий-Вилдад смеётся: 'Твоя Стрекоза - как твой позвоночник.'",
-        trigger: "Боль и насмешка: 'Краш-тест: позор.'",
-        action: "РАЗЖАТЬ_СУДОРОГУ"
-    },
-    {
-        id: "church_memory",
-        desc: "Церковь у реки вызывает память об исповеди. Фото выходит мутным, Гравий-Вилдад: 'Лайков: 0.'",
-        trigger: "Прощение матери и насмешка: 'Сожги церковь.'",
-        action: "УДАЛИТЬ_ФОТО"
-    },
-    {
-        id: "riverbank_whisper",
-        desc: "У реки Андрей слышит шёпот матери: 'Он ещё не заснул!' Кусты дышат её присутствием.",
-        trigger: "Голос: 'Ты хочешь, чтобы я умерла?'",
-        action: "ПОДойти_К_КУСТАМ"
-    },
-    {
-        id: "tunnel_collapse",
-        desc: "В туннеле Андрей видит мальчика с глазами матери. Кричит: 'Я не твой!' и вырывается на берег.",
-        trigger: "Обвинение: 'Ты её ударил!' и сигнал доступа.",
-        action: "ПОДТВЕРДИТЬ_ДОСТУП"
-    }
+const readerTraumaProfile = [
+    "MOTHER: you_drove_me_to_pills",
+    "CHURCH: holy_water_as_blood",
+    "TUNNEL: walls_breathe_her_tears"
 ];
 
-let traumaCount = 0;
-const errorRate = 0.6; // 60% chance of glitch
-const unlockThreshold = 3;
-const connectionDropRate = 0.2; // 20% chance of connection drop per event
+const events = [
+    { id: "night_ride", desc: "Андрей мчится по шоссе.", trigger: "Смех на обочине." },
+    { id: "window_frame", desc: "Оконная рама холодит лоб.", trigger: "Голос: 'Плачь.'" },
+    { id: "mothers_voice", desc: "Мать: 'Ты не мужик!'", trigger: "Унижение." },
+    { id: "muscle_spasm", desc: "Судорога в ноге.", trigger: "Насмешка: 'Позор.'" },
+    { id: "church_memory", desc: "Церковь у реки.", trigger: "Призыв: 'Сожги.'" },
+    { id: "riverbank_whisper", desc: "Шёпот матери у реки.", trigger: "Голос: 'Я умерла?'" },
+    { id: "tunnel_collapse", desc: "Мальчик с её глазами.", trigger: "Крик: 'Ты ударил!'" }
+];
+
+let traumaAlignmentCount = 0;
+const alignmentThreshold = 3;
+const connectionDropRate = 0.2;
 let outputDiv = null;
 let isSimulating = false;
 
@@ -65,14 +41,15 @@ function sleep(ms) {
 }
 
 function typeWriter(text, callback) {
+    outputDiv.textContent = ''; // Clear output
     let i = 0;
     function type() {
         if (i < text.length) {
-            outputDiv.innerHTML += text.charAt(i);
+            outputDiv.textContent += text.charAt(i);
             i++;
             setTimeout(type, 30);
         } else {
-            outputDiv.innerHTML += '\n';
+            outputDiv.textContent += '\n';
             outputDiv.scrollTop = outputDiv.scrollHeight;
             callback();
         }
@@ -80,113 +57,84 @@ function typeWriter(text, callback) {
     type();
 }
 
-function getRandomMemory() {
-    return `ERROR: MEMORY_CORRUPTED_${memoryFragments[Math.floor(Math.random() * memoryFragments.length)]}`;
+function getRandomServerTrauma() {
+    return memoryFragments[Math.floor(Math.random() * memoryFragments.length)];
 }
 
-async function simulatePing() {
-    outputDiv.innerHTML = '';
-    await typeWriter('[NEURALINK] Pinging neuralink-server.texas.usa [192.168.1.100]...', () => {});
-    let attempts = 0;
-    while (attempts < 3) {
+async function simulateConnection() {
+    await typeWriter(postClickIntro, async () => {
         await sleep(500);
-        if (Math.random() < 0.3) {
-            await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
-            attempts++;
-            await sleep(1000);
-        } else {
-            await typeWriter(`[NEURALINK] Reply from 192.168.1.100: bytes=32 time=${Math.floor(Math.random() * 100)}ms TTL=64`, () => {});
+        await typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server...', async () => {
             await sleep(500);
-            break;
-        }
-    }
-    if (attempts >= 3) {
-        await typeWriter('[NEURALINK] Connection failed. Retrying in background...', () => {});
-        await sleep(1000);
-    }
-    await typeWriter('[NEURALINK] Connected successfully.', () => {});
-    await sleep(500);
-    outputDiv.innerHTML = '';
+            await typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', async () => {
+                await sleep(500);
+                await typeWriter('[NEURALINK] Connected. Scanning psyche...', () => {});
+            });
+        });
+    });
 }
 
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
-        await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
-        let attempts = 0;
-        while (attempts < 3) {
+        await typeWriter('[NEURALINK] Connection lost. Retrying...', async () => {
             await sleep(1000);
-            if (Math.random() < 0.5) {
-                await typeWriter('[NEURALINK] Connection restored.', () => {});
-                return true;
-            }
-            await typeWriter('[NEURALINK] Reconnect attempt failed. Retrying...', () => {});
-            attempts++;
-        }
-        await typeWriter('[NEURALINK] Connection restored (emergency bypass).', () => {});
+            await typeWriter('[NEURALINK] Connection restored.', () => {});
+        });
         return true;
     }
     return false;
 }
 
 async function processEvent(event) {
-    try {
-        if (await simulateConnectionDrop()) {
-            await sleep(500);
-        }
-        await typeWriter(`[EVENT] ${event.desc}`, () => {});
-        await typeWriter(`[TRIGGER] ${event.trigger}`, () => {});
-        await typeWriter(`[NEURALINK] Processing: ${event.id}`, () => {});
+    if (await simulateConnectionDrop()) {
         await sleep(500);
-        if (traumaCount < unlockThreshold && Math.random() < errorRate) {
-            const horror = getRandomMemory();
-            await typeWriter(`[HORROR] Trauma detected: ${horror}`, () => {});
-            traumaCount++;
-            await typeWriter(`[DEBUG] Traumatic glitches: ${traumaCount}/${unlockThreshold}`, () => {});
-            if (traumaCount >= unlockThreshold) {
-                await typeWriter('=====================================', () => {});
-                await typeWriter('[NEURALINK] ACCESS UNLOCKED: Hidden Chapter', () => {});
-                await typeWriter('[HORROR] The tunnel breathes, her voice tears through the mind!', () => {});
-                await typeWriter('=====================================', () => {});
+    }
+    await typeWriter(`[EVENT] ${event.desc}`, () => {});
+    await typeWriter(`[TRIGGER] ${event.trigger}`, () => {});
+    await sleep(500);
+    if (traumaAlignmentCount < alignmentThreshold) {
+        const serverTrauma = getRandomServerTrauma();
+        await typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, () => {});
+        if (readerTraumaProfile.includes(serverTrauma)) {
+            traumaAlignmentCount++;
+            await typeWriter(`[TRAUMA] Aligned: ${serverTrauma} (${traumaAlignmentCount}/${alignmentThreshold})`, () => {});
+            if (traumaAlignmentCount >= alignmentThreshold) {
+                await typeWriter('=================', () => {});
+                await typeWriter('[NEURALINK] ACCESS UNLOCKED', () => {});
+                await typeWriter('[TRAUMA] Her voice tears through!', () => {});
+                await typeWriter('=================', () => {});
                 document.getElementById('confirm-box').style.display = 'block';
                 outputDiv.scrollTop = outputDiv.scrollHeight;
-                return "ACCESS//HIDDEN_CHAPTER";
+                return "ACCESS";
             }
-            await typeWriter('[RESULT] Action: LOOP//TRAUMA_NIGHTMARE', () => {});
-            return "LOOP//TRAUMA_NIGHTMARE";
+        } else {
+            await typeWriter('[NEURALINK] No alignment.', () => {});
         }
-        await typeWriter(`[NEURALINK] Status: Processed, Action: ${event.action}`, () => {});
-        await typeWriter(`[RESULT] Action: ${event.action}`, () => {});
-        outputDiv.scrollTop = outputDiv.scrollHeight;
-        return event.action;
-    } catch (e) {
-        console.error('Event processing failed:', e);
-        await typeWriter(`[ERROR] Failed to process event: ${event.id}`, () => {});
     }
+    outputDiv.scrollTop = outputDiv.scrollHeight;
 }
 
 async function startSimulation() {
     if (isSimulating) return;
     isSimulating = true;
-    console.log('Starting simulation...');
-    document.getElementById('confirm-box').style.display = 'none';
+    console.log('Simulation started');
     outputDiv = document.getElementById('output');
-    outputDiv.innerHTML = '';
-    traumaCount = 0;
+    document.getElementById('confirm-box').style.display = 'none';
+    traumaAlignmentCount = 0;
     try {
-        await simulatePing();
-        await typeWriter('[NEURALINK] Starting simulation...', async () => {
-            for (let event of events) {
-                const action = await processEvent(event);
-                await typeWriter('------------------------------------------------------------', () => {});
-                if (action === "ACCESS//HIDDEN_CHAPTER") break;
-                await sleep(1000);
-            }
-            isSimulating = false;
-            console.log('Simulation completed.');
-        });
+        await simulateConnection();
+        await sleep(500);
+        for (let event of events) {
+            await processEvent(event);
+            await typeWriter('-----', () => {});
+            if (traumaAlignmentCount >= alignmentThreshold) break;
+            await sleep(1000);
+        }
+        isSimulating = false;
+        console.log('Simulation ended');
     } catch (e) {
-        console.error('Simulation error:', e);
-        await typeWriter(`[CRITICAL ERROR] Simulation aborted: ${e.message}`, () => {});
+        console.error('Error:', e);
+        await typeWriter(`[ERROR] Failed: ${e.message}`, () => {});
         isSimulating = false;
     }
 }
@@ -202,12 +150,14 @@ function confirmChapter(confirmed) {
 document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start-button');
     if (startButton) {
-        startButton.addEventListener('click', () => {
-            console.log('Start button clicked.');
+        startButton.addEventListener('click', startSimulation);
+        startButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log('Touchstart triggered');
             startSimulation();
         });
     } else {
-        console.error('Start button not found.');
-        alert('Error: Start button not found. Please refresh the page.');
+        console.error('Start button missing');
+        alert('Error: Button not found. Refresh page.');
     }
 });
