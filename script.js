@@ -68,11 +68,12 @@ function typeWriter(text, callback) {
     let i = 0;
     function type() {
         if (i < text.length) {
-            outputDiv.innerHTML += text.charAt(i);
+            outputDiv.textContent += text.charAt(i);
             i++;
             setTimeout(type, 30);
         } else {
-            outputDiv.innerHTML += '\n';
+            outputDiv.textContent += '\n';
+            outputDiv.scrollTop = outputDiv.scrollHeight;
             callback();
         }
     }
@@ -80,11 +81,11 @@ function typeWriter(text, callback) {
 }
 
 function getRandomMemory() {
-    return `ОШИБКА: ПАМЯТЬ_ИСКАЖЕНА_${memoryFragments[Math.floor(Math.random() * memoryFragments.length)]}`;
+    return `ERROR: MEMORY_CORRUPTED_${memoryFragments[Math.floor(Math.random() * memoryFragments.length)]}`;
 }
 
 async function simulatePing() {
-    outputDiv.innerHTML = '';
+    outputDiv.textContent = '';
     await typeWriter('[NEURALINK] Pinging neuralink-server.texas.usa [192.168.1.100]...', () => {});
     let attempts = 0;
     while (attempts < 3) {
@@ -105,7 +106,7 @@ async function simulatePing() {
     }
     await typeWriter('[NEURALINK] Connected successfully.', () => {});
     await sleep(500);
-    outputDiv.innerHTML = '';
+    outputDiv.textContent = '';
 }
 
 async function simulateConnectionDrop() {
@@ -132,34 +133,34 @@ async function processEvent(event) {
         if (await simulateConnectionDrop()) {
             await sleep(500);
         }
-        await typeWriter(`[СОБЫТИЕ] ${event.desc}`, () => {});
-        await typeWriter(`[ТРИГГЕР] ${event.trigger}`, () => {});
-        await typeWriter(`[НЕЙРОЛИНК] Обработка: ${event.id}`, () => {});
+        await typeWriter(`[EVENT] ${event.desc}`, () => {});
+        await typeWriter(`[TRIGGER] ${event.trigger}`, () => {});
+        await typeWriter(`[NEURALINK] Processing: ${event.id}`, () => {});
         await sleep(500);
         if (traumaCount < unlockThreshold && Math.random() < errorRate) {
             const horror = getRandomMemory();
-            await typeWriter(`<span class="horror">[УЖАС] Травма врывается: ${horror}</span>`, () => {});
+            await typeWriter(`[HORROR] Trauma detected: ${horror}`, () => {});
             traumaCount++;
-            await typeWriter(`[DEBUG] Травматичных гличей: ${traumaCount}/${unlockThreshold}`, () => {});
+            await typeWriter(`[DEBUG] Traumatic glitches: ${traumaCount}/${unlockThreshold}`, () => {});
             if (traumaCount >= unlockThreshold) {
                 await typeWriter(`=====================================`, () => {});
-                await typeWriter(`<div class="unlock">[НЕЙРОЛИНК] ДОСТУП РАЗБЛОКИРОВАН: Скрытая глава</div>`, () => {});
-                await typeWriter(`[УЖАС] Туннель дышит, голос матери разрывает разум!`, () => {});
+                await typeWriter(`[NEURALINK] ACCESS UNLOCKED: Hidden Chapter`, () => {});
+                await typeWriter(`[HORROR] The tunnel breathes, her voice tears through the mind!`, () => {});
                 await typeWriter(`=====================================`, () => {});
                 document.getElementById('confirm-box').style.display = 'block';
                 outputDiv.scrollTop = outputDiv.scrollHeight;
-                return "ДОСТУП//СЕКРЕТНАЯ_ГЛАВА";
+                return "ACCESS//HIDDEN_CHAPTER";
             }
-            await typeWriter(`[РЕЗУЛЬТАТ] Действие: ПЕТЛЯ//ТРАВМА_КОШМАР`, () => {});
-            return "ПЕТЛЯ//ТРАВМА_КОШМАР";
+            await typeWriter(`[RESULT] Action: LOOP//TRAUMA_NIGHTMARE`, () => {});
+            return "LOOP//TRAUMA_NIGHTMARE";
         }
-        await typeWriter(`[НЕЙРОЛИНК] Состояние: Обработано, Действие: ${event.action}`, () => {});
-        await typeWriter(`[РЕЗУЛЬТАТ] Действие: ${event.action}`, () => {});
+        await typeWriter(`[NEURALINK] Status: Processed, Action: ${event.action}`, () => {});
+        await typeWriter(`[RESULT] Action: ${event.action}`, () => {});
         outputDiv.scrollTop = outputDiv.scrollHeight;
         return event.action;
     } catch (e) {
         console.error('Event processing failed:', e);
-        await typeWriter(`[ОШИБКА] Не удалось обработать событие: ${event.id}`, () => {});
+        await typeWriter(`[ERROR] Failed to process event: ${event.id}`, () => {});
     }
 }
 
@@ -169,14 +170,15 @@ async function startSimulation() {
     console.log('Starting simulation...');
     document.getElementById('confirm-box').style.display = 'none';
     outputDiv = document.getElementById('output');
+    outputDiv.textContent = '';
     traumaCount = 0;
     try {
         await simulatePing();
-        await typeWriter('[НЕЙРОЛИНК] Запуск симуляции...', async () => {
+        await typeWriter('[NEURALINK] Starting simulation...', async () => {
             for (let event of events) {
                 const action = await processEvent(event);
                 await typeWriter('------------------------------------------------------------', () => {});
-                if (action === "ДОСТУП//СЕКРЕТНАЯ_ГЛАВА") break;
+                if (action === "ACCESS//HIDDEN_CHAPTER") break;
                 await sleep(1000);
             }
             isSimulating = false;
@@ -184,7 +186,7 @@ async function startSimulation() {
         });
     } catch (e) {
         console.error('Simulation error:', e);
-        await typeWriter(`[КРИТИЧЕСКАЯ ОШИБКА] Симуляция прервана: ${e.message}`, () => {});
+        await typeWriter(`[CRITICAL ERROR] Simulation aborted: ${e.message}`, () => {});
         isSimulating = false;
     }
 }
