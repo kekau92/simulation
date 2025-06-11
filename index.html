@@ -5,86 +5,667 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Нейролинк: Симуляция</title>
     <style>
-        body {
-            background: #000;
-            color: #fff;
-            font-family: monospace;
+        :root {
+            --neon-red: #ff003c;
+            --neon-blue: #00e4ff;
+            --dark-bg: #040d0d;
+            --terminal-green: #3affc2;
+            --terminal-text: #e0e0e0;
+        }
+        
+        * {
             margin: 0;
-            padding: 10px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--dark-bg);
+            color: var(--terminal-text);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 60, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 228, 255, 0.05) 0%, transparent 20%);
+            overflow-x: hidden;
         }
-        h1 {
-            color: #f00;
-            font-size: 5vw;
+        
+        .header {
             text-align: center;
-            margin-bottom: 10px;
+            margin: 20px 0 40px;
+            position: relative;
         }
+        
+        h1 {
+            color: var(--neon-red);
+            font-size: 2.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5);
+            position: relative;
+            animation: pulse 3s infinite;
+        }
+        
+        .subtitle {
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+        
+        .terminal-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(10, 15, 15, 0.9);
+            border: 1px solid rgba(58, 255, 194, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(58, 255, 194, 0.1), 
+                        inset 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(58, 255, 194, 0.2);
+        }
+        
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: #ff5f57; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #28c940; }
+        
+        .terminal-title {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        
         #output {
-            background: #111;
-            color: #fff;
-            font-size: 3vw;
-            padding: 10px;
-            width: 90%;
-            height: 60vh;
+            height: 400px;
             overflow-y: auto;
-            border: 1px solid #f00;
-            margin-bottom: 10px;
+            padding: 15px;
+            background: rgba(4, 8, 8, 0.7);
+            border-radius: 4px;
+            font-size: 1.1rem;
+            line-height: 1.6;
             white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            color: var(--terminal-green);
+            text-shadow: 0 0 3px rgba(58, 255, 194, 0.5);
+            scrollbar-width: thin;
+            scrollbar-color: var(--terminal-green) transparent;
         }
-        button {
-            background: #f00;
-            color: #fff;
-            font-family: monospace;
-            font-size: 4vw;
-            padding: 10px;
-            border: none;
+        
+        #output::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #output::-webkit-scrollbar-thumb {
+            background: var(--terminal-green);
+            border-radius: 4px;
+        }
+        
+        #output::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .system-message {
+            color: var(--neon-blue);
+        }
+        
+        .trauma-message {
+            color: #ff6e6e;
+        }
+        
+        .access-granted {
+            color: #3affc2;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        #start-button {
+            background: linear-gradient(135deg, #0a0f0f, #031010);
+            color: var(--terminal-green);
+            border: 1px solid var(--terminal-green);
+            padding: 15px;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
-            width: 90%;
-            max-width: 200px;
-            margin: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        button:hover {
-            background: #c00;
+        
+        #start-button:hover {
+            background: rgba(58, 255, 194, 0.1);
+            box-shadow: 0 0 15px rgba(58, 255, 194, 0.3);
+            transform: translateY(-2px);
         }
+        
+        #start-button:active {
+            transform: translateY(1px);
+        }
+        
+        #start-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(58, 255, 194, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        #start-button:hover::before {
+            left: 100%;
+        }
+        
         #confirm-box {
             display: none;
-            position: fixed;
-            bottom: 0;
-            background: #000;
+            background: rgba(10, 15, 15, 0.95);
+            border: 1px solid var(--neon-red);
+            border-radius: 8px;
+            padding: 25px;
             width: 100%;
-            padding: 10px;
+            max-width: 800px;
             text-align: center;
+            box-shadow: 0 0 20px rgba(255, 0, 60, 0.3);
+            margin-top: 20px;
         }
+        
         #confirm-box p {
-            font-size: 3vw;
-            margin-bottom: 10px;
+            color: var(--terminal-green);
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            text-shadow: 0 0 5px rgba(58, 255, 194, 0.5);
         }
-        @media (max-width: 767px) {
-            h1 { font-size: 6vw; }
-            #output { font-size: 4vw; height: 50vh; }
-            button { font-size: 5vw; }
-            #confirm-box p { font-size: 4vw; }
+        
+        .confirm-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
-        @media (min-width: 768px) {
-            h1 { font-size: 2rem; }
-            #output { font-size: 1rem; }
-            button { font-size: 1.2rem; }
-            #confirm-box p { font-size: 1rem; }
+        
+        .confirm-button {
+            padding: 12px 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(20, 25, 25, 0.8);
+            color: var(--terminal-text);
+            border: 1px solid transparent;
+        }
+        
+        #confirm-yes {
+            background: rgba(58, 255, 194, 0.1);
+            color: var(--terminal-green);
+            border: 1px solid var(--terminal-green);
+        }
+        
+        #confirm-yes:hover {
+            background: rgba(58, 255, 194, 0.2);
+            box-shadow: 0 0 15px rgba(58, 255, 194, 0.3);
+        }
+        
+        #confirm-no {
+            background: rgba(255, 0, 60, 0.1);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
+        }
+        
+        #confirm-no:hover {
+            background: rgba(255, 0, 60, 0.2);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: rgba(224, 224, 224, 0.6);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5); }
+            50% { text-shadow: 0 0 15px var(--neon-red), 0 0 30px rgba(255, 0, 60, 0.7); }
+            100% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5); }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            5% { clip: rect(12px, 9999px, 59px, 0); }
+            10% { clip: rect(48px, 9999px, 29px, 0); }
+            15% { clip: rect(42px, 9999px, 73px, 0); }
+            20% { clip: rect(63px, 9999px, 27px, 0); }
+            25% { clip: rect(34px, 9999px, 55px, 0); }
+            30% { clip: rect(86px, 9999px, 73px, 0); }
+            35% { clip: rect(20px, 9999px, 20px, 0); }
+            40% { clip: rect(26px, 9999px, 60px, 0); }
+            45% { clip: rect(25px, 9999px, 66px, 0); }
+            50% { clip: rect(57px, 9999px, 98px, 0); }
+            55% { clip: rect(5px, 9999px, 46px, 0); }
+            60% { clip: rect(82px, 9999px, 31px, 0); }
+            65% { clip: rect(54px, 9999px, 27px, 0); }
+            70% { clip: rect(28px, 9999px, 99px, 0); }
+            75% { clip: rect(45px, 9999px, 69px, 0); }
+            80% { clip: rect(23px, 9999px, 85px, 0); }
+            85% { clip: rect(54px, 9999px, 84px, 0); }
+            90% { clip: rect(45px, 9999px, 47px, 0); }
+            95% { clip: rect(37px, 9999px, 20px, 0); }
+            100% { clip: rect(73px, 9999px, 99px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .terminal-container {
+                padding: 15px;
+            }
+            
+            #output {
+                height: 300px;
+                font-size: 0.95rem;
+            }
+            
+            #start-button {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            
+            #confirm-box p {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Нейролинк: Симуляция</h1>
-    <button id="start-button">ENTER</button>
-    <div id="output"></div>
-    <div id="confirm-box">
-        <p>ДОСТУП РАЗБЛОКИРОВАН. Войти?</p>
-        <button onclick="confirmChapter(true)">Подтвердить</button>
-        <button onclick="confirmChapter(false)">Отклонить</button>
+    <div class="header">
+        <h1 class="glitch" data-text="Нейролинк: Симуляция">Нейролинк: Симуляция</h1>
+        <div class="subtitle">Подключение к Андрею, сыну Пустоты</div>
     </div>
-    <script src="script.js"></script>
+    
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <div class="terminal-dot dot-red"></div>
+                <div class="terminal-dot dot-yellow"></div>
+                <div class="terminal-dot dot-green"></div>
+            </div>
+            <div class="terminal-title">ТЕРМИНАЛ СВЯЗИ: Андрей [СЫН ПУСТОТЫ]</div>
+        </div>
+        <div id="output"></div>
+    </div>
+    
+    <div class="controls">
+        <button id="start-button">ВХОД В СИСТЕМУ</button>
+        
+        <div id="confirm-box">
+            <p>ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ</p>
+            <div class="confirm-buttons">
+                <button id="confirm-yes" class="confirm-button">ПОДТВЕРДИТЬ</button>
+                <button id="confirm-no" class="confirm-button">ОТКЛОНИТЬ</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Система нейронного подключения v3.0 | Чёрный Пелотон © 2025
+    </div>
+
+    <script>
+        // Конфигурация симуляции
+        const postClickIntro = `> Попытка: взаимно стабилизировать нервную систему...
+> Результат: частичный успех.
+> Формируется биохимическая петля...
+> Источник: знакомая травма → реакция страха → всплеск дофамина
+> Цикл устойчив. Саморазрушение маскируется под близость.`;
+
+        const memoryFragments = [
+            "MIRROR: empty_label_no_face",
+            "MOTHER: you_drove_me_to_pills",
+            "CHURCH: holy_water_as_blood",
+            "TUNNEL: walls_breathe_her_tears",
+            "WINDOW: paint_and_rust",
+            "PAIN: hot_wire_in_thigh",
+            "BOY: her_eyes_in_his"
+        ];
+
+        const readerTraumaProfile = [
+            "MOTHER: you_drove_me_to_pills",
+            "CHURCH: holy_water_as_blood",
+            "TUNNEL: walls_breathe_her_tears"
+        ];
+
+        const events = [
+            { id: "night_ride", desc: "Андрей мчится по шоссе.", trigger: "Смех на обочине." },
+            { id: "window_frame", desc: "Оконная рама холодит лоб.", trigger: "Голос: 'Плачь.'" },
+            { id: "mothers_voice", desc: "Мать: 'Ты не мужик!'", trigger: "Унижение." },
+            { id: "muscle_spasm", desc: "Судорога в ноге.", trigger: "Насмешка: 'Позор.'" },
+            { id: "church_memory", desc: "Церковь у реки.", trigger: "Призыв: 'Сожги.'" },
+            { id: "riverbank_whisper", desc: "Шёпот матери у реки.", trigger: "Голос: 'Я умерла?'" },
+            { id: "tunnel_collapse", desc: "Мальчик с её глазами.", trigger: "Крик: 'Ты ударил!'" }
+        ];
+
+        // Переменные состояния
+        let traumaAlignmentCount = 0;
+        const alignmentThreshold = 3;
+        const connectionDropRate = 0.2;
+        let outputDiv = null;
+        let isSimulating = false;
+
+        // Вспомогательные функции
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function typeWriter(text, callback) {
+            if (!outputDiv) return;
+            
+            const lines = text.split('\n');
+            let currentLine = 0;
+            
+            function writeLine() {
+                if (currentLine < lines.length) {
+                    const line = lines[currentLine];
+                    let i = 0;
+                    
+                    function typeChar() {
+                        if (i < line.length) {
+                            outputDiv.textContent += line.charAt(i);
+                            i++;
+                            setTimeout(typeChar, 30);
+                        } else {
+                            outputDiv.textContent += '\n';
+                            outputDiv.scrollTop = outputDiv.scrollHeight;
+                            currentLine++;
+                            setTimeout(writeLine, 100);
+                        }
+                    }
+                    
+                    typeChar();
+                } else if (callback) {
+                    callback();
+                }
+            }
+            
+            writeLine();
+        }
+
+        function getRandomServerTrauma() {
+            return memoryFragments[Math.floor(Math.random() * memoryFragments.length)];
+        }
+
+        // Основные функции симуляции
+        async function simulateConnection() {
+            await new Promise(resolve => {
+                typeWriter(postClickIntro, resolve);
+            });
+            
+            await sleep(500);
+            
+            await new Promise(resolve => {
+                typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server...', resolve);
+            });
+            
+            await sleep(800);
+            
+            await new Promise(resolve => {
+                typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
+            });
+            
+            await sleep(600);
+            
+            await new Promise(resolve => {
+                typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
+            });
+        }
+
+        async function simulateConnectionDrop() {
+            if (Math.random() < connectionDropRate) {
+                await new Promise(resolve => {
+                    typeWriter('[NEURALINK] Connection lost. Retrying...', resolve);
+                });
+                
+                await sleep(1200);
+                
+                await new Promise(resolve => {
+                    typeWriter('[NEURALINK] Connection restored.', resolve);
+                });
+                
+                return true;
+            }
+            return false;
+        }
+
+        async function processEvent(event) {
+            if (await simulateConnectionDrop()) {
+                await sleep(500);
+            }
+            
+            await new Promise(resolve => {
+                typeWriter(`\n[EVENT] ${event.desc}`, resolve);
+            });
+            
+            await new Promise(resolve => {
+                typeWriter(`[TRIGGER] ${event.trigger}`, resolve);
+            });
+            
+            await sleep(700);
+            
+            if (traumaAlignmentCount < alignmentThreshold) {
+                const serverTrauma = getRandomServerTrauma();
+                
+                await new Promise(resolve => {
+                    typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, resolve);
+                });
+                
+                if (readerTraumaProfile.includes(serverTrauma)) {
+                    traumaAlignmentCount++;
+                    
+                    await new Promise(resolve => {
+                        typeWriter(`[TRAUMA] Aligned: ${serverTrauma} (${traumaAlignmentCount}/${alignmentThreshold})`, resolve);
+                    });
+                    
+                    if (traumaAlignmentCount >= alignmentThreshold) {
+                        await new Promise(resolve => {
+                            typeWriter('\n=================', resolve);
+                        });
+                        
+                        await new Promise(resolve => {
+                            typeWriter('[NEURALINK] ACCESS UNLOCKED', resolve);
+                        });
+                        
+                        await new Promise(resolve => {
+                            typeWriter('[TRAUMA] Her voice tears through!', resolve);
+                        });
+                        
+                        await new Promise(resolve => {
+                            typeWriter('=================', resolve);
+                        });
+                        
+                        document.getElementById('confirm-box').style.display = 'block';
+                        return "ACCESS";
+                    }
+                } else {
+                    await new Promise(resolve => {
+                        typeWriter('[NEURALINK] No alignment.', resolve);
+                    });
+                }
+            }
+        }
+
+        async function startSimulation() {
+            if (isSimulating) return;
+            isSimulating = true;
+            
+            const startButton = document.getElementById('start-button');
+            startButton.textContent = "ПОДКЛЮЧЕНИЕ...";
+            startButton.disabled = true;
+            
+            outputDiv = document.getElementById('output');
+            outputDiv.textContent = '';
+            document.getElementById('confirm-box').style.display = 'none';
+            traumaAlignmentCount = 0;
+            
+            try {
+                // Инициализация подключения
+                await simulateConnection();
+                
+                // Обработка событий
+                for (let event of events) {
+                    const result = await processEvent(event);
+                    if (result === "ACCESS") break;
+                    
+                    // Добавляем разделитель между событиями
+                    await new Promise(resolve => {
+                        typeWriter('----------------------------------------', resolve);
+                    });
+                    
+                    await sleep(1000);
+                }
+                
+                if (traumaAlignmentCount < alignmentThreshold) {
+                    await new Promise(resolve => {
+                        typeWriter('\n[NEURALINK] Insufficient trauma alignment. Access denied.', resolve);
+                    });
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                await new Promise(resolve => {
+                    typeWriter(`[ERROR] Simulation failed: ${e.message}`, resolve);
+                });
+            } finally {
+                startButton.textContent = "ПЕРЕЗАПУСТИТЬ СИМУЛЯЦИЮ";
+                startButton.disabled = false;
+                isSimulating = false;
+            }
+        }
+
+        function confirmChapter(confirmed) {
+            if (confirmed) {
+                window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK21TDZGMpIbrW4BD05cNUMKUZlFl0zI/view';
+            } else {
+                window.location.href = 'https://t.me/santabeansreserveandlab';
+            }
+        }
+
+        // Инициализация страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            const startButton = document.getElementById('start-button');
+            startButton.addEventListener('click', startSimulation);
+            
+            const confirmYes = document.getElementById('confirm-yes');
+            const confirmNo = document.getElementById('confirm-no');
+            
+            confirmYes.addEventListener('click', () => confirmChapter(true));
+            confirmNo.addEventListener('click', () => confirmChapter(false));
+        });
+    </script>
 </body>
 </html>
