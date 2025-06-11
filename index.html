@@ -1,353 +1,353 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нейролинк: Симуляция</title>
-    <style>
-        :root {
-            --neon-red: #ff003c;
-            --neon-blue: #00e4ff;
-            --dark-bg: #040d0d;
-            --terminal-green: #3affc2;
-            --terminal-text: #e0e0e0;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background: var(--dark-bg);
-            color: var(--terminal-text);
-            font-family: 'Courier New', monospace;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 60, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0, 228, 255, 0.05) 0%, transparent 20%);
-            overflow-x: hidden;
-        }
-        
-        .header {
-            text-align: center;
-            margin: 20px 0 40px;
-            position: relative;
-        }
-        
-        h1 {
-            color: var(--neon-red);
-            font-size: 2.8rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5);
-            position: relative;
-            animation: pulse 3s infinite;
-        }
-        
-        .subtitle {
-            color: var(--neon-blue);
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            opacity: 0.8;
-        }
-        
-        .terminal-container {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(10, 15, 15, 0.9);
-            border: 1px solid rgba(58, 255, 194, 0.3);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(58, 255, 194, 0.1), 
-                        inset 0 0 10px rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .terminal-header {
-            display: flex;
-            align-items: center;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(58, 255, 194, 0.2);
-        }
-        
-        .terminal-dots {
-            display: flex;
-            gap: 8px;
-            margin-right: 15px;
-        }
-        
-        .terminal-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        .dot-red { background: #ff5f57; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #28c940; }
-        
-        .terminal-title {
-            color: var(--terminal-green);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-        
-        #output {
-            height: 400px;
-            overflow-y: auto;
-            padding: 15px;
-            background: rgba(4, 8, 8, 0.7);
-            border-radius: 4px;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            font-family: 'Courier New', monospace;
-            color: var(--terminal-green);
-            text-shadow: 0 0 3px rgba(58, 255, 194, 0.5);
-            scrollbar-width: thin;
-            scrollbar-color: var(--terminal-green) transparent;
-        }
-        
-        #output::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        #output::-webkit-scrollbar-thumb {
-            background: var(--terminal-green);
-            border-radius: 4px;
-        }
-        
-        #output::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        .system-message {
-            color: var(--neon-blue);
-        }
-        
-        .trauma-message {
-            color: #ff6e6e;
-        }
-        
-        .access-granted {
-            color: #3affc2;
-            font-weight: bold;
-            animation: blink 1s infinite;
-        }
-        
-        .access-link {
-            color: #3affc2;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            max-width: 800px;
-        }
-        
-        #start-button {
-            background: linear-gradient(135deg, #0a0f0f, #031010);
-            color: var(--terminal-green);
-            border: 1px solid var(--terminal-green);
-            padding: 15px;
-            font-size: 1.2rem;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #start-button:hover {
-            background: rgba(58, 255, 194, 0.1);
-            box-shadow: 0 0 15px rgba(58, 255, 194, 0.3);
-            transform: translateY(-2px);
-        }
-        
-        #start-button:active {
-            transform: translateY(1px);
-        }
-        
-        #start-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(58, 255, 194, 0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        #start-button:hover::before {
-            left: 100%;
-        }
-        
-        .glitch {
-            position: relative;
-        }
-        
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .glitch::before {
-            left: 2px;
-            text-shadow: -2px 0 #ff00c1;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        
-        .glitch::after {
-            left: -2px;
-            text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
-        
-        .footer {
-            margin-top: 30px;
-            color: rgba(224, 224, 224, 0.6);
-            font-size: 0.9rem;
-            text-align: center;
-            padding: 15px;
-        }
-        
-        /* Animations */
-        @keyframes pulse {
-            0% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5); }
-            50% { text-shadow: 0 0 15px var(--neon-red), 0 0 30px rgba(255, 0, 60, 0.7); }
-            100% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5); }
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(54px, 9999px, 84px, 0); }
-            90% { clip: rect(45px, 9999px, 47px, 0); }
-            95% { clip: rect(37px, 9999px, 20px, 0); }
-            100% { clip: rect(73px, 9999px, 99px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            5% { clip: rect(52px, 9999px, 74px, 0); }
-            10% { clip: rect(79px, 9999px, 85px, 0); }
-            15% { clip: rect(75px, 9999px, 5px, 0); }
-            20% { clip: rect(67px, 9999px, 61px, 0); }
-            25% { clip: rect(14px, 9999px, 79px, 0); }
-            30% { clip: rect(1px, 9999px, 66px, 0); }
-            35% { clip: rect(86px, 9999px, 30px, 0); }
-            40% { clip: rect(23px, 9999px, 98px, 0); }
-            45% { clip: rect(85px, 9999px, 72px, 0); }
-            50% { clip: rect(71px, 9999px, 75px, 0); }
-            55% { clip: rect(2px, 9999px, 48px, 0); }
-            60% { clip: rect(30px, 9999px, 16px, 0); }
-            65% { clip: rect(59px, 9999px, 50px, 0); }
-            70% { clip: rect(41px, 9999px, 62px, 0); }
-            75% { clip: rect(2px, 9999px, 82px, 0); }
-            80% { clip: rect(47px, 9999px, 73px, 0); }
-            85% { clip: rect(3px, 9999px, 27px, 0); }
-            90% { clip: rect(26px, 9999px, 55px, 0); }
-            95% { clip: rect(42px, 9999px, 97px, 0); }
-            100% { clip: rect(38px, 9999px, 49px, 0); }
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Нейронная связь: Имитация</title>
+        <style>
+            :root {
+                --neon-red: #ff003c;
+                --neon-blue: #00e4ff;
+                --dark-bg: #040d0d;
+                --terminal-green: #3affc2;
+                --terminal-text: #e0e0e0;
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                background: var(--dark-bg);
+                color: var(--terminal-text);
+                font-family: 'Courier New', monospace;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+                background-image: 
+                    radial-gradient(circle at 10% 20%, rgba(255, 0, 60, 0.05) 0%, transparent 20%),
+                    radial-gradient(circle at 90% 80%, rgba(0, 228, 255, 0.05) 0%, transparent 20%);
+                overflow-x: hidden;
+            }
+            
+            .header {
+                text-align: center;
+                margin: 20px 0 40px;
+                position: relative;
+            }
+            
             h1 {
-                font-size: 2rem;
+                color: var(--neon-red);
+                font-size: 2.8rem;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                margin-bottom: 10px;
+                text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5);
+                position: relative;
+                animation: pulse 3s infinite;
             }
             
             .subtitle {
-                font-size: 1rem;
+                color: var(--neon-blue);
+                font-size: 1.2rem;
+                letter-spacing: 2px;
+                opacity: 0.8;
             }
             
             .terminal-container {
-                padding: 15px;
+                width: 100%;
+                max-width: 800px;
+                background: rgba(10, 15, 15, 0.9);
+                border: 1px solid rgba(58, 255, 194, 0.3);
+                border-radius: 8px;
+                box-shadow: 0 0 20px rgba(58, 255, 194, 0.1), 
+                            inset 0 0 10px rgba(0, 0, 0, 0.5);
+                padding: 20px;
+                margin-bottom: 30px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .terminal-header {
+                display: flex;
+                align-items: center;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+                border-bottom: 1px solid rgba(58, 255, 194, 0.2);
+            }
+            
+            .terminal-dots {
+                display: flex;
+                gap: 8px;
+                margin-right: 15px;
+            }
+            
+            .terminal-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+            }
+            
+            .dot-red { background: #ff5f57; }
+            .dot-yellow { background: #ffbd2e; }
+            .dot-green { background: #28c940; }
+            
+            .terminal-title {
+                color: var(--terminal-green);
+                font-size: 0.9rem;
+                letter-spacing: 1px;
             }
             
             #output {
-                height: 300px;
-                font-size: 0.95rem;
+                height: 400px;
+                overflow-y: auto;
+                padding: 15px;
+                background: rgba(4, 8, 8, 0.7);
+                border-radius: 4px;
+                font-size: 1.1rem;
+                line-height: 1.6;
+                white-space: pre-wrap;
+                font-family: 'Courier New', monospace;
+                color: var(--terminal-green);
+                text-shadow: 0 0 3px rgba(58, 255, 194, 0.5);
+                scrollbar-width: thin;
+                scrollbar-color: var(--terminal-green) transparent;
+            }
+            
+            #output::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            #output::-webkit-scrollbar-thumb {
+                background: var(--terminal-green);
+                border-radius: 4px;
+            }
+            
+            #output::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            
+            .system-message {
+                color: var(--neon-blue);
+            }
+            
+            .trauma-message {
+                color: #ff6e6e;
+            }
+            
+            .access-granted {
+                color: #3affc2;
+                font-weight: bold;
+                animation: blink 1s infinite;
+            }
+            
+            .access-link {
+                color: #3affc2;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+            
+            .controls {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+                max-width: 800px;
             }
             
             #start-button {
-                font-size: 1rem;
-                padding: 12px;
+                background: linear-gradient(135deg, #0a0f0f, #031010);
+                color: var(--terminal-green);
+                border: 1px solid var(--terminal-green);
+                padding: 15px;
+                font-size: 1.2rem;
+                font-family: 'Courier New', monospace;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
             }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1 class="glitch" data-text="Нейролинк: Симуляция">Нейролинк: Симуляция</h1>
-        <div class="subtitle">Подключение к Андрею, ACCESS_REQUEST: СКРЫТАЯ ЧАСТЬ</div>
-    </div>
-    
-    <div class="terminal-container">
-        <div class="terminal-header">
-            <div class="terminal-dots">
-                <div class="terminal-dot dot-red"></div>
-                <div class="terminal-dot dot-yellow"></div>
-                <div class="terminal-dot dot-green"></div>
-            </div>
-            <div class="terminal-title">SYSTEM NEUROLINK CONSOLE > TRACE: SUBJECT = ANDREI_001</div>
+            
+            #start-button:hover {
+                background: rgba(58, 255, 194, 0.1);
+                box-shadow: 0 0 15px rgba(58, 255, 194, 0.3);
+                transform: translateY(-2px);
+            }
+            
+            #start-button:active {
+                transform: translateY(1px);
+            }
+            
+            #start-button::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(58, 255, 194, 0.2), transparent);
+                transition: 0.5s;
+            }
+            
+            #start-button:hover::before {
+                left: 100%;
+            }
+            
+            .glitch {
+                position: relative;
+            }
+            
+            .glitch::before,
+            .glitch::after {
+                content: attr(data-text);
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            
+            .glitch::before {
+                left: 2px;
+                text-shadow: -2px 0 #ff00c1;
+                clip: rect(44px, 450px, 56px, 0);
+                animation: glitch-anim 5s infinite linear alternate-reverse;
+            }
+            
+            .glitch::after {
+                left: -2px;
+                text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+                clip: rect(44px, 450px, 56px, 0);
+                animation: glitch-anim2 5s infinite linear alternate-reverse;
+            }
+            
+            .footer {
+                margin-top: 30px;
+                color: rgba(224, 224, 224, 0.6);
+                font-size: 0.9rem;
+                text-align: center;
+                padding: 15px;
+            }
+            
+            /* Animations */
+            @keyframes pulse {
+                0% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5); }
+                50% { text-shadow: 0 0 15px var(--neon-red), 0 0 30px rgba(255, 0, 60, 0.7); }
+                100% { text-shadow: 0 0 10px var(--neon-red), 0 0 20px rgba(255, 0, 60, 0.5); }
+            }
+            
+            @keyframes blink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            @keyframes glitch-anim {
+                0% { clip: rect(42px, 9999px, 44px, 0); }
+                5% { clip: rect(12px, 9999px, 59px, 0); }
+                10% { clip: rect(48px, 9999px, 29px, 0); }
+                15% { clip: rect(42px, 9999px, 73px, 0); }
+                20% { clip: rect(63px, 9999px, 27px, 0); }
+                25% { clip: rect(34px, 9999px, 55px, 0); }
+                30% { clip: rect(86px, 9999px, 73px, 0); }
+                35% { clip: rect(20px, 9999px, 20px, 0); }
+                40% { clip: rect(26px, 9999px, 60px, 0); }
+                45% { clip: rect(25px, 9999px, 66px, 0); }
+                50% { clip: rect(57px, 9999px, 98px, 0); }
+                55% { clip: rect(5px, 9999px, 46px, 0); }
+                60% { clip: rect(82px, 9999px, 31px, 0); }
+                65% { clip: rect(54px, 9999px, 27px, 0); }
+                70% { clip: rect(28px, 9999px, 99px, 0); }
+                75% { clip: rect(45px, 9999px, 69px, 0); }
+                80% { clip: rect(23px, 9999px, 85px, 0); }
+                85% { clip: rect(54px, 9999px, 84px, 0); }
+                90% { clip: rect(45px, 9999px, 47px, 0); }
+                95% { clip: rect(37px, 9999px, 20px, 0); }
+                100% { clip: rect(73px, 9999px, 99px, 0); }
+            }
+            
+            @keyframes glitch-anim2 {
+                0% { clip: rect(65px, 9999px, 100px, 0); }
+                5% { clip: rect(52px, 9999px, 74px, 0); }
+                10% { clip: rect(79px, 9999px, 85px, 0); }
+                15% { clip: rect(75px, 9999px, 5px, 0); }
+                20% { clip: rect(67px, 9999px, 61px, 0); }
+                25% { clip: rect(14px, 9999px, 79px, 0); }
+                30% { clip: rect(1px, 9999px, 66px, 0); }
+                35% { clip: rect(86px, 9999px, 30px, 0); }
+                40% { clip: rect(23px, 9999px, 98px, 0); }
+                45% { clip: rect(85px, 9999px, 72px, 0); }
+                50% { clip: rect(71px, 9999px, 75px, 0); }
+                55% { clip: rect(2px, 9999px, 48px, 0); }
+                60% { clip: rect(30px, 9999px, 16px, 0); }
+                65% { clip: rect(59px, 9999px, 50px, 0); }
+                70% { clip: rect(41px, 9999px, 62px, 0); }
+                75% { clip: rect(2px, 9999px, 82px, 0); }
+                80% { clip: rect(47px, 9999px, 73px, 0); }
+                85% { clip: rect(3px, 9999px, 27px, 0); }
+                90% { clip: rect(26px, 9999px, 55px, 0); }
+                95% { clip: rect(42px, 9999px, 97px, 0); }
+                100% { clip: rect(38px, 9999px, 49px, 0); }
+            }
+            
+            /* Responsive design */
+            @media (max-width: 768px) {
+                h1 {
+                    font-size: 2rem;
+                }
+                
+                .subtitle {
+                    font-size: 1rem;
+                }
+                
+                .terminal-container {
+                    padding: 15px;
+                }
+                
+                #output {
+                    height: 300px;
+                    font-size: 0.95rem;
+                }
+                
+                #start-button {
+                    font-size: 1rem;
+                    padding: 12px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1 class="glitch" data-text="Нейролинк: Симуляция">Нейролинк: Симуляция</h1>
+            <div class="subtitle">Подключение к Андрею, ACCESS_REQUEST: СКРЫТАЯ ЧАСТЬ</div>
         </div>
-        <div id="output"></div>
-    </div>
+        
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="terminal-dot dot-red"></div>
+                    <div class="terminal-dot dot-yellow"></div>
+                    <div class="terminal-dot dot-green"></div>
+                </div>
+                <div class="terminal-title">SYSTEM NEUROLINK CONSOLE > TRACE: SUBJECT = ANDREI_001</div>
+            </div>
+            <div id="output"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-button">ВХОД В СИСТЕМУ</button>
+        </div>
+        
+        <div class="footer">
+            PROCESSOR = trauma.sync.v3.0 │ │ > RANGE: chapters 1–3 | MODE = passive relay (subcortical + auditory layers)
+        </div>
     
-    <div class="controls">
-        <button id="start-button">ВХОД В СИСТЕМУ</button>
-    </div>
-    
-    <div class="footer">
-        PROCESSOR = trauma.sync.v3.0 │ │ > RANGE: chapters 1–3 | MODE = passive relay (subcortical + auditory layers)
-    </div>
-
-    <script src="script.js"></script>
-</body>
+        <script src="script.js"></script>
+    </body>
 </html>
