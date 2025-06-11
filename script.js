@@ -89,7 +89,7 @@ async function simulatePing() {
     let attempts = 0;
     while (attempts < 3) {
         await sleep(500);
-        if (Math.random() < 0.3) { // 30% chance of initial failure
+        if (Math.random() < 0.3) {
             await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
             attempts++;
             await sleep(1000);
@@ -114,7 +114,7 @@ async function simulateConnectionDrop() {
         let attempts = 0;
         while (attempts < 3) {
             await sleep(1000);
-            if (Math.random() < 0.5) { // 50% chance of reconnect success
+            if (Math.random() < 0.5) {
                 await typeWriter('[NEURALINK] Connection restored.', () => {});
                 return true;
             }
@@ -143,7 +143,7 @@ async function processEvent(event) {
             await typeWriter(`[DEBUG] Травматичных гличей: ${traumaCount}/${unlockThreshold}`, () => {});
             if (traumaCount >= unlockThreshold) {
                 await typeWriter(`=====================================`, () => {});
-                await typeWriter(`<div class="unlock">[НЕЙРОЛИНК] ДОСТУП РАЗБЛОКИРОВАН: Свиток III½ - Суд на берегу Стикса</div>`, () => {});
+                await typeWriter(`<div class="unlock">[НЕЙРОЛИНК] ДОСТУП РАЗБЛОКИРОВАН: Скрытая глава</div>`, () => {});
                 await typeWriter(`[УЖАС] Туннель дышит, голос матери разрывает разум!`, () => {});
                 await typeWriter(`=====================================`, () => {});
                 document.getElementById('confirm-box').style.display = 'block';
@@ -186,6 +186,14 @@ async function startSimulation() {
         console.error('Simulation error:', e);
         await typeWriter(`[КРИТИЧЕСКАЯ ОШИБКА] Симуляция прервана: ${e.message}`, () => {});
         isSimulating = false;
+    }
+}
+
+function confirmChapter(confirmed) {
+    if (confirmed) {
+        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view';
+    } else {
+        window.location.href = 'https://t.me/santabeansreserveandlab';
     }
 }
 
