@@ -53,16 +53,10 @@ const events = [
     }
 ];
 
-const glitchChars = [
-    "̴͓̻̰͇̱̲Н̷̛̫̼̘̼Е̶̮̜̯͝Й̴̛̳̙̗Р̵̛̺̤̰О̷̛̜̘Л̴̛̳̙̗И̵̛̺̤̰Н̷̛̫̼̘̼К̶̮̜̯͝",
-    "̵̢̳̻̝̦͓̰̲Z̴̢̡̫̮̙͚̻̦A̵̢̠̺̝͓̺L̴̢̢̡̳̖̪̺̰G̵̢̢̳̫̙O̴̢̠̝̱̙",
-    "̸̡̝̻̫̜̳̰͠C̵̢̡̳̖̪̺O̴̢̠̝̱̙R̵̢̳̻̝̦͓R̴̢̡̫̮̙͚U̵̢̠̺̝͓̺P̴̢̢̡̳̖̪T̵̢̢̳̫̙",
-    "̶̴̡̝̻̫̜̳̰͓̻̰͇̱̲E̷̛̫̼̘̼R̶̮̜̯͝R̴̛̳̙̗Ơ̵̺̤̰R̷̛̜̘_̴̛̳̙̗M̵̛̺̤̰E̷̛̫̼̘̼M̶̮̜̯͝"
-];
-
 let traumaCount = 0;
 const errorRate = 0.6; // 60% chance of glitch
 const unlockThreshold = 3;
+const connectionDropRate = 0.2; // 20% chance of connection drop per event
 let outputDiv = null;
 let isSimulating = false;
 
@@ -89,22 +83,55 @@ function getRandomMemory() {
     return `ОШИБКА: ПАМЯТЬ_ИСКАЖЕНА_${memoryFragments[Math.floor(Math.random() * memoryFragments.length)]}`;
 }
 
-function getRandomGlitch() {
-    return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+async function simulatePing() {
+    outputDiv.innerHTML = '';
+    await typeWriter('[NEURALINK] Pinging neuralink-server.texas.usa [192.168.1.100]...', () => {});
+    let attempts = 0;
+    while (attempts < 3) {
+        await sleep(500);
+        if (Math.random() < 0.3) { // 30% chance of initial failure
+            await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
+            attempts++;
+            await sleep(1000);
+        } else {
+            await typeWriter(`[NEURALINK] Reply from 192.168.1.100: bytes=32 time=${Math.floor(Math.random() * 100)}ms TTL=64`, () => {});
+            await sleep(500);
+            break;
+        }
+    }
+    if (attempts >= 3) {
+        await typeWriter('[NEURALINK] Connection failed. Retrying in background...', () => {});
+        await sleep(1000);
+    }
+    await typeWriter('[NEURALINK] Connected successfully.', () => {});
+    await sleep(500);
+    outputDiv.innerHTML = '';
 }
 
-async function showGlitchEffect() {
-    if (window.innerWidth < 768) return; // Skip on mobile
-    outputDiv.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
-        outputDiv.innerHTML = `<span class="glitch">${getRandomGlitch()}</span>`;
-        await sleep(200);
+async function simulateConnectionDrop() {
+    if (Math.random() < connectionDropRate) {
+        await typeWriter('[NEURALINK] Connection lost. Re-establishing...', () => {});
+        let attempts = 0;
+        while (attempts < 3) {
+            await sleep(1000);
+            if (Math.random() < 0.5) { // 50% chance of reconnect success
+                await typeWriter('[NEURALINK] Connection restored.', () => {});
+                return true;
+            }
+            await typeWriter('[NEURALINK] Reconnect attempt failed. Retrying...', () => {});
+            attempts++;
+        }
+        await typeWriter('[NEURALINK] Connection restored (emergency bypass).', () => {});
+        return true;
     }
-    outputDiv.innerHTML = '';
+    return false;
 }
 
 async function processEvent(event) {
     try {
+        if (await simulateConnectionDrop()) {
+            await sleep(500);
+        }
         await typeWriter(`[СОБЫТИЕ] ${event.desc}`, () => {});
         await typeWriter(`[ТРИГГЕР] ${event.trigger}`, () => {});
         await typeWriter(`[НЕЙРОЛИНК] Обработка: ${event.id}`, () => {});
@@ -144,7 +171,7 @@ async function startSimulation() {
     outputDiv = document.getElementById('output');
     traumaCount = 0;
     try {
-        await showGlitchEffect();
+        await simulatePing();
         await typeWriter('[НЕЙРОЛИНК] Запуск симуляции...', async () => {
             for (let event of events) {
                 const action = await processEvent(event);
