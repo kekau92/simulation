@@ -82,6 +82,43 @@ function typeWriter(text, callback) {
     writeLine();
 }
 
+function typeWriterWithLink(text, linkText, url, callback) {
+    if (!outputDiv) return;
+    
+    const lines = text.split('\n');
+    let currentLine = 0;
+    
+    function writeLine() {
+        if (currentLine < lines.length) {
+            const line = lines[currentLine];
+            if (line.includes(linkText)) {
+                const parts = line.split(linkText);
+                typeWriter(parts[0], () => {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.textContent = linkText;
+                    link.className = 'access-link';
+                    link.target = '_blank';
+                    outputDiv.appendChild(link);
+                    outputDiv.appendChild(document.createTextNode('\n'));
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                    currentLine++;
+                    setTimeout(writeLine, 50);
+                });
+            } else {
+                typeWriter(line, () => {
+                    currentLine++;
+                    setTimeout(writeLine, 50);
+                });
+            }
+        } else if (callback) {
+            callback();
+        }
+    }
+    
+    writeLine();
+}
+
 function getRandomServerTrauma() {
     return memoryFragments[Math.floor(Math.random() * memoryFragments.length)];
 }
@@ -170,10 +207,12 @@ async function processEvent(event) {
                 });
                 
                 await new Promise(resolve => {
-                    typeWriter('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ\n\nПОДТВЕРДИТЬ\nОТКЛОНИТЬ', resolve);
+                    typeWriterWithLink('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
+                        'ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
+                        'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
+                        resolve);
                 });
                 
-                document.getElementById('confirm-box').style.display = 'block';
                 return "ACCESS";
             }
         } else {
@@ -194,7 +233,6 @@ async function startSimulation() {
     
     outputDiv = document.getElementById('output');
     outputDiv.textContent = '';
-    document.getElementById('confirm-box').style.display = 'none';
     traumaAlignmentCount = 0;
     
     try {
@@ -228,21 +266,7 @@ async function startSimulation() {
     }
 }
 
-function confirmChapter(confirmed) {
-    if (confirmed) {
-        window.location.href = 'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI';
-    } else {
-        window.location.href = 'https://t.me/santabeansreserveandlab';
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start-button');
     startButton.addEventListener('click', startSimulation);
-    
-    const confirmYes = document.getElementById('confirm-yes');
-    const confirmNo = document.getElementById('confirm-no');
-    
-    confirmYes.addEventListener('click', () => confirmChapter(true));
-    confirmNo.addEventListener('click', () => confirmChapter(false));
 });
