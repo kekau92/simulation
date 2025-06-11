@@ -131,32 +131,32 @@ async function simulateConnection() {
     await sleep(500);
     
     await new Promise(resolve => {
-        typeWriter('[NEURALINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
+        typeWriter('[NEUROLINK] Connecting DEVICE: USER_LOCAL to server at 600 Navarro St, Ste 350, San Antonio, TX 78205, US...', resolve);
     });
     
     await sleep(800);
     
     await new Promise(resolve => {
-        typeWriter('[NEURALINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
+        typeWriter('[NEUROLINK] Reply: time=' + Math.floor(Math.random() * 100) + 'ms', resolve);
     });
     
     await sleep(600);
     
     await new Promise(resolve => {
-        typeWriter('[NEURALINK] Connected. Scanning psyche...', resolve);
+        typeWriter('[NEUROLINK] Connected. Scanning psyche...', resolve);
     });
 }
 
 async function simulateConnectionDrop() {
     if (Math.random() < connectionDropRate) {
         await new Promise(resolve => {
-            typeWriter('[NEURALINK] Connection lost. Retrying...', resolve);
+            typeWriter('[NEUROLINK] Connection lost. Retrying...', resolve);
         });
         
         await sleep(1200);
         
         await new Promise(resolve => {
-            typeWriter('[NEURALINK] Connection restored.', resolve);
+            typeWriter('[NEUROLINK] Connection restored.', resolve);
         });
         
         return true;
@@ -183,7 +183,7 @@ async function processEvent(event) {
         const serverTrauma = getRandomServerTrauma();
         
         await new Promise(resolve => {
-            typeWriter(`[NEURALINK] Trauma: ${serverTrauma}`, resolve);
+            typeWriter(`[NEUROLINK] Trauma: ${serverTrauma}`, resolve);
         });
         
         if (readerTraumaProfile.includes(serverTrauma)) {
@@ -199,7 +199,7 @@ async function processEvent(event) {
                 });
                 
                 await new Promise(resolve => {
-                    typeWriter('[NEURALINK] ACCESS UNLOCKED', resolve);
+                    typeWriter('[NEUROLINK] ACCESS UNLOCKED', resolve);
                 });
                 
                 await new Promise(resolve => {
@@ -209,7 +209,7 @@ async function processEvent(event) {
                 await new Promise(resolve => {
                     typeWriterWithLink('=================\nДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
                         'ДОСТУП РАЗБЛОКИРОВАН: СКРЫТАЯ ЧАСТЬ', 
-                        'https://docs.google.com/document/d/1VEqjaU44MljK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
+                        'https://docs.google.com/document/d/1VEqjaU44MljjK2iTDZGMpIbrW4BD05cNUMKUZlFl0zI/view', 
                         resolve);
                 });
                 
@@ -217,7 +217,7 @@ async function processEvent(event) {
             }
         } else {
             await new Promise(resolve => {
-                typeWriter('[NEURALINK] No alignment.', resolve);
+                typeWriter('[NEUROLINK] No alignment.', resolve);
             });
         }
     }
@@ -251,7 +251,7 @@ async function startSimulation() {
         
         if (traumaAlignmentCount < alignmentThreshold) {
             await new Promise(resolve => {
-                typeWriter('\n[NEURALINK] Insufficient trauma alignment. Access denied.', resolve);
+                typeWriter('\n[NEUROLINK] Insufficient trauma alignment. Access denied.', resolve);
             });
         }
     } catch (e) {
